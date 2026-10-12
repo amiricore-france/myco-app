@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+*.db
+*.db-journal
+.DS_Store
+*.log
+
+# --- Spécifique Myco ---
+server/uploads/
+bioclip-service/.venv/
+bioclip-service/__pycache__/
+*.pyc
+.backup-*/

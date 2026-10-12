@@ -1,0 +1,609 @@
+[
+  {
+    "latin": "Boletus edulis",
+    "common_fr": "Cèpe de Bordeaux",
+    "edibility": "excellent",
+    "season": ["août", "septembre", "octobre", "novembre"],
+    "habitat": "Forêts de feuillus (chênes, châtaigniers) et de conifères, sols acides",
+    "trees": ["chêne", "châtaignier", "hêtre", "épicéa"],
+    "confusions": [
+      { "latin": "Tylopilus felleus", "common_fr": "Bolet amer", "danger": "Non toxique mais immangeable (amertume extrême)", "how": "Pores rosés, réseau brun sur le pied, goût amer" }
+    ],
+    "notes": "Le roi des champignons. Chair blanche immuable à la coupe."
+  },
+  {
+    "latin": "Boletus pinophilus",
+    "common_fr": "Cèpe des pins",
+    "edibility": "excellent",
+    "season": ["septembre", "octobre", "novembre"],
+    "habitat": "Forêts de pins, sols acides, souvent en altitude",
+    "trees": ["pin"],
+    "confusions": [],
+    "notes": "Chapeau brun-rouge, plus trapu que le cèpe de Bordeaux."
+  },
+  {
+    "latin": "Boletus reticulatus",
+    "common_fr": "Cèpe d'été",
+    "edibility": "excellent",
+    "season": ["juin", "juillet", "août", "septembre"],
+    "habitat": "Forêts de feuillus (chênes, hêtres)",
+    "trees": ["chêne", "hêtre", "châtaignier"],
+    "confusions": [],
+    "notes": "Apparaît dès le début de l'été, avant les autres cèpes."
+  },
+  {
+    "latin": "Leccinum scabrum",
+    "common_fr": "Bolet rude",
+    "edibility": "bon",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Sous bouleaux, sols acides",
+    "trees": ["bouleau"],
+    "confusions": [],
+    "notes": "Pied orné de petites squames noirâtres. Chair devenant grisâtre puis noirâtre à la cuisson."
+  },
+  {
+    "latin": "Leccinum aurantiacum",
+    "common_fr": "Bolet orangé",
+    "edibility": "bon",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Sous trembles et peupliers",
+    "trees": ["tremble", "peuplier"],
+    "confusions": [],
+    "notes": "Chapeau orange vif. Chair noircissante à la coupe."
+  },
+  {
+    "latin": "Xerocomus subtomentosus",
+    "common_fr": "Bolet moucheté",
+    "edibility": "comestible",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts de feuillus, lisières, talus",
+    "trees": ["chêne", "hêtre"],
+    "confusions": [],
+    "notes": "Chapeau velouté jaune-olive. Espèce très variable."
+  },
+  {
+    "latin": "Suillus luteus",
+    "common_fr": "Bolet jaune",
+    "edibility": "comestible",
+    "season": ["septembre", "octobre", "novembre"],
+    "habitat": "Sous pins, surtout pins sylvestres",
+    "trees": ["pin"],
+    "confusions": [],
+    "notes": "Chapeau brun visqueux, anneau membraneux. À peler avant cuisson."
+  },
+  {
+    "latin": "Suillus granulatus",
+    "common_fr": "Bolet granulé",
+    "edibility": "comestible",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Sous pins",
+    "trees": ["pin"],
+    "confusions": [],
+    "notes": "Pas d'anneau, pores laissant échapper des gouttelettes laiteuses."
+  },
+  {
+    "latin": "Cantharellus cibarius",
+    "common_fr": "Girolle",
+    "edibility": "excellent",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts de feuillus et mixtes, sols acides",
+    "trees": ["chêne", "hêtre", "châtaignier", "bouleau"],
+    "confusions": [
+      { "latin": "Hygrophoropsis aurantiaca", "common_fr": "Fausse girolle", "danger": "Comestibilité douteuse, provoque des troubles digestifs", "how": "Vraies lames fines et serrées (pas des plis épais et fourchus), pas d'odeur d'abricot" },
+      { "latin": "Omphalotus illudens", "common_fr": "Clitocybe lumineux", "danger": "Toxique (intoxications sévères)", "how": "Pousse en touffes sur bois mort, lames non fourchues, bioluminescent" }
+    ],
+    "notes": "Odeur d'abricot caractéristique. Plis épais et fourchus, non des lames."
+  },
+  {
+    "latin": "Cantharellus tubaeformis",
+    "common_fr": "Chanterelle en tube",
+    "edibility": "bon",
+    "season": ["septembre", "octobre", "novembre", "décembre"],
+    "habitat": "Forêts de conifères et mixtes, mousses",
+    "trees": ["épicéa", "sapin", "hêtre"],
+    "confusions": [],
+    "notes": "Chapeau brun-gris en entonnoir, plis bien marqués descendant sur le pied."
+  },
+  {
+    "latin": "Craterellus cornucopioides",
+    "common_fr": "Trompette de la mort",
+    "edibility": "excellent",
+    "season": ["septembre", "octobre", "novembre"],
+    "habitat": "Forêts de feuillus, sols frais",
+    "trees": ["chêne", "hêtre", "châtaignier"],
+    "confusions": [],
+    "notes": "Noirâtre en forme de cornet. Excellent séché."
+  },
+  {
+    "latin": "Lactarius deliciosus",
+    "common_fr": "Lactaire délicieux",
+    "edibility": "bon",
+    "season": ["septembre", "octobre", "novembre"],
+    "habitat": "Sous pins",
+    "trees": ["pin"],
+    "confusions": [],
+    "notes": "Lait orangé carotte à la coupe, verdissant à l'air."
+  },
+  {
+    "latin": "Lactarius sanguifluus",
+    "common_fr": "Lactaire sanguin",
+    "edibility": "bon",
+    "season": ["septembre", "octobre", "novembre"],
+    "habitat": "Sous pins, sols calcaires",
+    "trees": ["pin"],
+    "confusions": [],
+    "notes": "Lait rouge sang à la coupe."
+  },
+  {
+    "latin": "Russula emetica",
+    "common_fr": "Russule émétique",
+    "edibility": "toxique",
+    "season": ["juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts humides, sphaignes",
+    "trees": ["pin", "épicéa", "bouleau"],
+    "confusions": [
+      { "latin": "Russula paludosa", "common_fr": "Russule des marais", "danger": "Comestible", "how": "Chapeau plus orangé, lames jaunâtres" }
+    ],
+    "notes": "Chapeau rouge vif, lames blanches, goût très âcre et brûlant."
+  },
+  {
+    "latin": "Russula virescens",
+    "common_fr": "Russule verdoyante",
+    "edibility": "excellent",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts de feuillus",
+    "trees": ["chêne", "hêtre", "châtaignier"],
+    "confusions": [],
+    "notes": "Chapeau vert craquelé comme une peau de melon."
+  },
+  {
+    "latin": "Russula cyanoxantha",
+    "common_fr": "Russule charbonnière",
+    "edibility": "bon",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts de feuillus",
+    "trees": ["chêne", "hêtre", "châtaignier"],
+    "confusions": [],
+    "notes": "Chapeau violacé-verdâtre. Lames souples et non cassantes (caractère unique)."
+  },
+  {
+    "latin": "Amanita phalloides",
+    "common_fr": "Amanite phalloïde",
+    "edibility": "mortel",
+    "season": ["juillet", "août", "septembre", "octobre", "novembre"],
+    "habitat": "Forêts de feuillus, surtout sous chênes",
+    "trees": ["chêne", "hêtre", "châtaignier"],
+    "confusions": [
+      { "latin": "Agaricus campestris", "common_fr": "Rosé des prés", "danger": "Comestible", "how": "Lames roses puis brunes (jamais blanches), pas de volve" },
+      { "latin": "Russula virescens", "common_fr": "Russule verdoyante", "danger": "Comestible", "how": "Pas d'anneau ni de volve, chapeau craquelé" }
+    ],
+    "notes": "⚠️ MORTELLE — responsable de 90 % des intoxications mortelles en France. Chapeau vert olive, lames blanches, anneau, volve en sac."
+  },
+  {
+    "latin": "Amanita virosa",
+    "common_fr": "Amanite vireuse",
+    "edibility": "mortel",
+    "season": ["août", "septembre", "octobre"],
+    "habitat": "Forêts de conifères",
+    "trees": ["épicéa", "pin", "sapin"],
+    "confusions": [],
+    "notes": "⚠️ MORTELLE — entièrement blanche. Confusion possible avec l'agaric champêtre."
+  },
+  {
+    "latin": "Amanita muscaria",
+    "common_fr": "Amanite tue-mouches",
+    "edibility": "toxique",
+    "season": ["août", "septembre", "octobre", "novembre"],
+    "habitat": "Forêts de bouleaux, pins, épicéas",
+    "trees": ["bouleau", "pin", "épicéa"],
+    "confusions": [],
+    "notes": "Chapeau rouge à points blancs. Toxique (syndrome panthérinien)."
+  },
+  {
+    "latin": "Amanita rubescens",
+    "common_fr": "Amanite rougissante",
+    "edibility": "bon",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts variées, sols non calcaires",
+    "trees": ["chêne", "hêtre", "bouleau", "pin"],
+    "confusions": [
+      { "latin": "Amanita pantherina", "common_fr": "Amanite panthère", "danger": "Toxique (syndrome panthérinien)", "how": "Chair immuable (ne rougit pas), anneau non strié" }
+    ],
+    "notes": "Chair rougissant à la cassure. Bien cuire (toxine thermolabile)."
+  },
+  {
+    "latin": "Amanita caesarea",
+    "common_fr": "Amanite des Césars",
+    "edibility": "excellent",
+    "season": ["juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts de chênes, sols chauds, région méditerranéenne",
+    "trees": ["chêne"],
+    "confusions": [],
+    "notes": "Chapeau orangé, lames jaunes, volve blanche. Rare en France hors zone méditerranéenne."
+  },
+  {
+    "latin": "Amanita vaginata",
+    "common_fr": "Amanite vaginée",
+    "edibility": "comestible",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts variées, prairies",
+    "trees": ["chêne", "hêtre", "pin"],
+    "confusions": [],
+    "notes": "Chapeau gris-brun, stries sur le bord, volve en sac. Pas d'anneau."
+  },
+  {
+    "latin": "Tricholoma equestre",
+    "common_fr": "Tricholome équestre",
+    "edibility": "toxique",
+    "season": ["octobre", "novembre", "décembre", "janvier"],
+    "habitat": "Forêts de pins, sous aiguilles",
+    "trees": ["pin"],
+    "confusions": [],
+    "notes": "⚠️ TOXIQUE depuis 2021 — responsable du syndrome de rhabdomyolyse. Autrefois considéré comestible."
+  },
+  {
+    "latin": "Tricholoma portentosum",
+    "common_fr": "Tricholome prétentieux",
+    "edibility": "bon",
+    "season": ["octobre", "novembre", "décembre"],
+    "habitat": "Forêts de pins et mixtes, sols acides",
+    "trees": ["pin", "épicéa"],
+    "confusions": [],
+    "notes": "Chapeau gris à reflets verdâtres, lames blanc-jaunâtre."
+  },
+  {
+    "latin": "Armillaria mellea",
+    "common_fr": "Armillaire couleur de miel",
+    "edibility": "comestible",
+    "season": ["septembre", "octobre", "novembre"],
+    "habitat": "Souches, arbres vivants ou morts, en touffes",
+    "trees": ["chêne", "hêtre", "bouleau"],
+    "confusions": [
+      { "latin": "Galerina marginata", "common_fr": "Galerine marginée", "danger": "MORTELLE (mêmes toxines que l'amanite phalloïde)", "how": "Petite taille, sur bois, anneau, pas de touffe dense" }
+    ],
+    "notes": "Pousse en grosses touffes sur bois. Parasite redoutable des arbres."
+  },
+  {
+    "latin": "Marasmius oreades",
+    "common_fr": "Marasme des Oréades",
+    "edibility": "bon",
+    "season": ["mai", "juin", "juillet", "août", "septembre", "octobre", "novembre"],
+    "habitat": "Prairies, pelouses, souvent en rond de sorcière",
+    "trees": [],
+    "confusions": [],
+    "notes": "Petit chapeau beige, pied coriace. Excellent séché."
+  },
+  {
+    "latin": "Pleurotus ostreatus",
+    "common_fr": "Pleurote en huître",
+    "edibility": "bon",
+    "season": ["octobre", "novembre", "décembre", "janvier", "février"],
+    "habitat": "Troncs et souches de feuillus",
+    "trees": ["hêtre", "peuplier", "saule"],
+    "confusions": [],
+    "notes": "En forme de coquille, pousse en touffes sur bois. Cultivé industriellement."
+  },
+  {
+    "latin": "Agaricus campestris",
+    "common_fr": "Rosé des prés",
+    "edibility": "bon",
+    "season": ["mai", "juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Prairies, pâturages",
+    "trees": [],
+    "confusions": [
+      { "latin": "Amanita phalloides", "common_fr": "Amanite phalloïde", "danger": "MORTELLE", "how": "Lames toujours blanches, anneau, volve en sac" }
+    ],
+    "notes": "Lames roses puis brun foncé. Odeur agréable d'amande."
+  },
+  {
+    "latin": "Macrolepiota procera",
+    "common_fr": "Coulemelle",
+    "edibility": "excellent",
+    "season": ["août", "septembre", "octobre", "novembre"],
+    "habitat": "Prairies, lisières, clairières",
+    "trees": ["chêne", "hêtre"],
+    "confusions": [
+      { "latin": "Macrolepiota venenata", "common_fr": "Lépiote vénéneuse", "danger": "Toxique (troubles digestifs sévères)", "how": "Chair rougissant puis noircissant à la coupe, pas de mamelon, pousse en milieu riche" },
+      { "latin": "Chlorophyllum molybdites", "common_fr": "Lépiote de Morgan", "danger": "Toxique (troubles digestifs sévères)", "how": "Lames verdissant à maturité, rare en Europe" }
+    ],
+    "notes": "Grand chapeau à squames, pied tigré, anneau coulissant. Le pied est ligneux, on ne consomme que le chapeau."
+  },
+  {
+    "latin": "Morchella esculenta",
+    "common_fr": "Morille comestible",
+    "edibility": "excellent",
+    "season": ["mars", "avril", "mai"],
+    "habitat": "Forêts de feuillus, vergers, bords de rivière",
+    "trees": ["frêne", "pommier", "peuplier"],
+    "confusions": [
+      { "latin": "Gyromitra esculenta", "common_fr": "Gyromitre", "danger": "Toxique (syndrome gyromitrien, peut être mortel)", "how": "Chapeau cérébriforme (pas alvéolé comme une éponge), brun-rouge" }
+    ],
+    "notes": "À bien cuire. Ne jamais consommer crue."
+  },
+  {
+    "latin": "Morchella conica",
+    "common_fr": "Morille conique",
+    "edibility": "excellent",
+    "season": ["mars", "avril", "mai"],
+    "habitat": "Forêts, brûlis, vergers",
+    "trees": ["frêne", "pin"],
+    "confusions": [],
+    "notes": "Chapeau conique. Mêmes précautions que la morille comestible."
+  },
+  {
+    "latin": "Gyromitra esculenta",
+    "common_fr": "Gyromitre",
+    "edibility": "toxique",
+    "season": ["mars", "avril", "mai"],
+    "habitat": "Forêts de conifères, sols sableux",
+    "trees": ["pin", "épicéa"],
+    "confusions": [
+      { "latin": "Morchella esculenta", "common_fr": "Morille comestible", "danger": "Comestible", "how": "Chapeau alvéolé en nid d'abeille, pas cérébriforme" }
+    ],
+    "notes": "⚠️ TOXIQUE — contient de la gyromitrine, substance volatile et cumulative. Ne jamais consommer même cuit."
+  },
+  {
+    "latin": "Coprinus comatus",
+    "common_fr": "Coprin chevelu",
+    "edibility": "bon",
+    "season": ["septembre", "octobre", "novembre"],
+    "habitat": "Pelouses, bords de chemin, terrains vagues",
+    "trees": [],
+    "confusions": [
+      { "latin": "Coprinopsis atramentaria", "common_fr": "Coprin noir d'encre", "danger": "Toxique en mélange avec l'alcool (syndrome coprinien)", "how": "Chapeau gris uni, pas de squames blanches" }
+    ],
+    "notes": "Chapeau allongé à squames blanches. À consommer très jeune (se délite en encre)."
+  },
+  {
+    "latin": "Lycoperdon perlatum",
+    "common_fr": "Vesse-de-loup perlée",
+    "edibility": "comestible",
+    "season": ["août", "septembre", "octobre", "novembre"],
+    "habitat": "Forêts, chemins",
+    "trees": ["chêne", "hêtre", "pin"],
+    "confusions": [],
+    "notes": "À consommer jeune, quand l'intérieur est encore blanc et homogène."
+  },
+  {
+    "latin": "Hydnum repandum",
+    "common_fr": "Pied-de-mouton",
+    "edibility": "bon",
+    "season": ["septembre", "octobre", "novembre"],
+    "habitat": "Forêts de feuillus et conifères",
+    "trees": ["chêne", "hêtre", "épicéa", "pin"],
+    "confusions": [],
+    "notes": "Aiguillons sous le chapeau (et non des lames ou des pores)."
+  },
+  {
+    "latin": "Clitocybe nebularis",
+    "common_fr": "Clitocybe nébuleux",
+    "edibility": "toxique",
+    "season": ["octobre", "novembre", "décembre"],
+    "habitat": "Forêts, souvent en rond de sorcière",
+    "trees": ["hêtre", "chêne", "pin"],
+    "confusions": [],
+    "notes": "Chapeau gris-brun, odeur forte et désagréable. Toxique (troubles digestifs)."
+  },
+  {
+    "latin": "Clitocybe dealbata",
+    "common_fr": "Clitocybe blanc",
+    "edibility": "toxique",
+    "season": ["août", "septembre", "octobre", "novembre"],
+    "habitat": "Prairies, pelouses",
+    "trees": [],
+    "confusions": [
+      { "latin": "Marasmius oreades", "common_fr": "Marasme des Oréades", "danger": "Comestible", "how": "Chapeau beige (pas blanc), pied coriace, lames espacées" }
+    ],
+    "notes": "⚠️ TOXIQUE — contient de la muscarine. Syndrome muscarinien (sueurs, salivation, troubles visuels)."
+  },
+  {
+    "latin": "Paxillus involutus",
+    "common_fr": "Paxille enroulé",
+    "edibility": "mortel",
+    "season": ["août", "septembre", "octobre", "novembre"],
+    "habitat": "Forêts variées, bouleaux surtout",
+    "trees": ["bouleau", "chêne", "pin"],
+    "confusions": [],
+    "notes": "⚠️ MORTEL — provoque un syndrome immunologique (hémolyse) pouvant survenir plusieurs heures après le repas. Longtemps considéré comestible à tort."
+  },
+  {
+    "latin": "Cortinarius orellanus",
+    "common_fr": "Cortinaire des montagnes",
+    "edibility": "mortel",
+    "season": ["août", "septembre", "octobre"],
+    "habitat": "Forêts de feuillus, sols acides",
+    "trees": ["chêne", "châtaignier", "hêtre"],
+    "confusions": [],
+    "notes": "⚠️ MORTEL — syndrome orellanien à latence longue (3 à 15 jours), insuffisance rénale irréversible."
+  },
+  {
+    "latin": "Cortinarius rubellus",
+    "common_fr": "Cortinaire couleur de rouille",
+    "edibility": "mortel",
+    "season": ["août", "septembre", "octobre"],
+    "habitat": "Forêts humides, sols acides",
+    "trees": ["pin", "épicéa", "bouleau"],
+    "confusions": [],
+    "notes": "⚠️ MORTEL — même syndrome que C. orellanus."
+  },
+  {
+    "latin": "Boletus satanas",
+    "common_fr": "Bolet Satan",
+    "edibility": "toxique",
+    "season": ["juin", "juillet", "août", "septembre"],
+    "habitat": "Forêts de feuillus, sols calcaires",
+    "trees": ["chêne", "châtaignier", "hêtre"],
+    "confusions": [],
+    "notes": "Chapeau blanchâtre, pores rouges, pied trapu rouge. Toxique (troubles digestifs sévères)."
+  },
+  {
+    "latin": "Amanita pantherina",
+    "common_fr": "Amanite panthère",
+    "edibility": "toxique",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts variées",
+    "trees": ["chêne", "hêtre", "bouleau", "pin"],
+    "confusions": [
+      { "latin": "Amanita rubescens", "common_fr": "Amanite rougissante", "danger": "Comestible (bien cuite)", "how": "Chair rougissant à la cassure, anneau strié" }
+    ],
+    "notes": "⚠️ TOXIQUE — syndrome panthérinien (délire, convulsions). Chapeau brun à points blancs, anneau non strié, volve en bourrelet."
+  },
+  {
+    "latin": "Agaricus xanthodermus",
+    "common_fr": "Agaric jaunissant",
+    "edibility": "toxique",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Prairies, jardins, bords de route",
+    "trees": [],
+    "confusions": [
+      { "latin": "Agaricus campestris", "common_fr": "Rosé des prés", "danger": "Comestible", "how": "Pas de jaunissement à la base, odeur agréable" }
+    ],
+    "notes": "⚠️ TOXIQUE — jaunit fortement à la base du pied et à la pression. Odeur d'encre ou de phénol."
+  },
+  {
+    "latin": "Galerina marginata",
+    "common_fr": "Galerine marginée",
+    "edibility": "mortel",
+    "season": ["août", "septembre", "octobre", "novembre"],
+    "habitat": "Sur bois mort, souches, branches",
+    "trees": ["pin", "épicéa", "hêtre"],
+    "confusions": [
+      { "latin": "Armillaria mellea", "common_fr": "Armillaire couleur de miel", "danger": "Comestible (bien cuite)", "how": "Plus grande, pousse en touffes denses, squames sur le chapeau" },
+      { "latin": "Kuehneromyces mutabilis", "common_fr": "Pholiote changeante", "danger": "Comestible", "how": "Chapeau hygrophane (deux tons), pousse en touffes sur souches" }
+    ],
+    "notes": "⚠️ MORTELLE — mêmes toxines que l'amanite phalloïde (amanitines). Confusion très dangereuse avec la pholiote changeante."
+  },
+  {
+    "latin": "Omphalotus illudens",
+    "common_fr": "Clitocybe lumineux",
+    "edibility": "toxique",
+    "season": ["août", "septembre", "octobre", "novembre"],
+    "habitat": "Souches de feuillus, en touffes",
+    "trees": ["chêne", "olivier"],
+    "confusions": [
+      { "latin": "Cantharellus cibarius", "common_fr": "Girolle", "danger": "Excellent comestible", "how": "Vraies lames (pas de plis fourchus), pousse au sol, odeur d'abricot" }
+    ],
+    "notes": "⚠️ TOXIQUE — syndrome gastro-intestinal sévère. Bioluminescent (légère lueur verte dans le noir)."
+  },
+  {
+    "latin": "Hypholoma fasciculare",
+    "common_fr": "Hypholome en touffes",
+    "edibility": "toxique",
+    "season": ["avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre"],
+    "habitat": "Souches et bois mort, en touffes denses",
+    "trees": ["chêne", "hêtre"],
+    "confusions": [
+      { "latin": "Armillaria mellea", "common_fr": "Armillaire couleur de miel", "danger": "Comestible (bien cuite)", "how": "Chapeau miel à squames, anneau présent, saveur douce" }
+    ],
+    "notes": "⚠️ TOXIQUE — très amer. Lames jaunes puis verdâtres à maturité. Pousse en touffes très denses sur souches."
+  },
+  {
+    "latin": "Lactarius torminosus",
+    "common_fr": "Lactaire tomenteux",
+    "edibility": "toxique",
+    "season": ["août", "septembre", "octobre"],
+    "habitat": "Sous bouleaux",
+    "trees": ["bouleau"],
+    "confusions": [],
+    "notes": "Chapeau rose à zonures, bord velu. Lait blanc âcre. Toxique (troubles digestifs)."
+  },
+  {
+    "latin": "Russula foetens",
+    "common_fr": "Russule fétide",
+    "edibility": "toxique",
+    "season": ["juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts variées",
+    "trees": ["chêne", "hêtre"],
+    "confusions": [],
+    "notes": "Odeur nauséabonde. Toxique (troubles digestifs)."
+  },
+  {
+    "latin": "Entoloma lividum",
+    "common_fr": "Entolome livide",
+    "edibility": "toxique",
+    "season": ["août", "septembre", "octobre"],
+    "habitat": "Forêts de feuillus, lisières, haies",
+    "trees": ["chêne", "hêtre", "noisetier"],
+    "confusions": [
+      { "latin": "Clitocybe nebularis", "common_fr": "Clitocybe nébuleux", "danger": "Toxique", "how": "Lames non rosées, odeur forte" },
+      { "latin": "Tricholoma portentosum", "common_fr": "Tricholome prétentieux", "danger": "Comestible", "how": "Lames blanches à reflets jaunes, jamais rosées" }
+    ],
+    "notes": "⚠️ TOXIQUE — responsable d'intoxications sévères. Lames devenant rosées à maturité, odeur de farine."
+  },
+  {
+    "latin": "Amanita citrina",
+    "common_fr": "Amanite citrine",
+    "edibility": "toxique",
+    "season": ["août", "septembre", "octobre", "novembre"],
+    "habitat": "Forêts variées",
+    "trees": ["chêne", "hêtre", "pin"],
+    "confusions": [
+      { "latin": "Amanita phalloides", "common_fr": "Amanite phalloïde", "danger": "MORTELLE", "how": "Chapeau plus franchement vert-olive, pas de teinte citron" }
+    ],
+    "notes": "Chapeau jaune citron pâle à verdâtre, avec des plaques blanches. Odeur de pomme de terre crue. Toxique (troubles digestifs)."
+  },
+  {
+    "latin": "Amanita verna",
+    "common_fr": "Amanite printanière",
+    "edibility": "mortel",
+    "season": ["avril", "mai", "juin"],
+    "habitat": "Forêts de feuillus, sols calcaires",
+    "trees": ["chêne", "hêtre"],
+    "confusions": [],
+    "notes": "⚠️ MORTELLE — entièrement blanche, apparaît au printemps. Souvent confondue avec des agarics ou des tricholomes blancs."
+  },
+  {
+    "latin": "Boletus luridus",
+    "common_fr": "Bolet blafard",
+    "edibility": "comestible",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts de feuillus, sols calcaires",
+    "trees": ["chêne", "hêtre", "châtaignier"],
+    "confusions": [
+      { "latin": "Boletus satanas", "common_fr": "Bolet Satan", "danger": "Toxique", "how": "Chapeau blanchâtre, pied trapu et rouge, pas de réseau net" }
+    ],
+    "notes": "Chapeau brun-olive, pores rouges, réseau rouge sur le pied. À bien cuire. Bleuissement à la coupe."
+  },
+  {
+    "latin": "Boletus erythropus",
+    "common_fr": "Bolet à pied rouge",
+    "edibility": "bon",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts variées, sols acides",
+    "trees": ["chêne", "hêtre", "épicéa"],
+    "confusions": [],
+    "notes": "Pied rouge ponctué, pores rouges. Bleuit intensément à la coupe. À bien cuire."
+  },
+  {
+    "latin": "Caloboletus calopus",
+    "common_fr": "Bolet à beau pied",
+    "edibility": "toxique",
+    "season": ["juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts de feuillus et conifères, sols acides",
+    "trees": ["chêne", "hêtre", "épicéa"],
+    "confusions": [],
+    "notes": "Pied jaune orné d'un réseau rouge vif. Goût très amer. Toxique (troubles digestifs)."
+  },
+  {
+    "latin": "Tylopilus felleus",
+    "common_fr": "Bolet amer",
+    "edibility": "non_comestible",
+    "season": ["juin", "juillet", "août", "septembre", "octobre"],
+    "habitat": "Forêts variées, sols acides",
+    "trees": ["chêne", "hêtre", "châtaignier", "pin"],
+    "confusions": [
+      { "latin": "Boletus edulis", "common_fr": "Cèpe de Bordeaux", "danger": "Excellent comestible", "how": "Pores blancs (jamais rosés), réseau blanc sur le pied" }
+    ],
+    "notes": "Non toxique mais immangeable (amertume extrême). Pores devenant roses à maturité."
+  },
+  {
+    "latin": "unknown species",
+    "common_fr": "Espèce non identifiée",
+    "edibility": "unknown",
+    "season": [],
+    "habitat": "",
+    "trees": [],
+    "confusions": [],
+    "notes": "BioCLIP n'a pas pu associer l'image à une espèce connue de la liste."
+  }
+]
