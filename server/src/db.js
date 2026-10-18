@@ -12,6 +12,7 @@ export async function getDb() {
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       name TEXT,
+      leaderboard_opt_in INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     CREATE TABLE IF NOT EXISTS spots (
@@ -35,6 +36,7 @@ export async function getDb() {
       spot_id INTEGER,
       species TEXT,
       weight_g INTEGER,
+      photos_json TEXT DEFAULT '[]',
       notes TEXT,
       found_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

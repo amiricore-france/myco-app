@@ -12,3 +12,8 @@ bioclip-service/.venv/
 bioclip-service/__pycache__/
 *.pyc
 .backup-*/
+
+# Scripts d'installation one-shot
+install-*.sh
+fix-*.sh
+loading

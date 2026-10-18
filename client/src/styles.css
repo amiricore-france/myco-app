@@ -1,61 +1,197 @@
-* { box-sizing: border-box; }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: #f6f7f4;
-  color: #1e2a1e;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900 font-sans antialiased;
+  }
+
+  h1 { @apply text-3xl font-bold text-neutral-900 leading-tight; }
+  h2 { @apply text-2xl font-semibold text-neutral-900 leading-tight; }
+  h3 { @apply text-xl font-semibold text-neutral-800; }
+  h4 { @apply text-lg font-semibold text-neutral-800; }
+
+  a { @apply text-primary-700 underline-offset-2 hover:underline; }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-600 ring-offset-2;
+  }
+
+  @media (max-width: 640px) {
+    input, select, textarea { font-size: 16px; }
+  }
 }
 
-a { color: #2e6b3e; text-decoration: none; }
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[1100px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8;
+  }
 
-nav {
-  display: flex; gap: 1rem; padding: 0.75rem 1.25rem;
-  background: #2e6b3e; color: white; align-items: center;
-}
-nav a { color: white; opacity: 0.85; }
-nav a.active { opacity: 1; font-weight: 600; }
-nav .spacer { flex: 1; }
+  .container-page-mobile {
+    @apply mx-auto w-full px-4 py-4 pb-24;
+  }
 
-.container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
-
-.card {
-  background: white; border-radius: 10px; padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 1rem;
+  .text-mono-num {
+    @apply font-mono tabular-nums;
+  }
 }
 
-button, input, select, textarea {
-  font: inherit; padding: 0.5rem 0.75rem; border-radius: 6px;
-  border: 1px solid #cfd6cc; background: white;
+/* ================================================================
+   COMPATIBILITÉ TEMPORAIRE — à retirer quand tous les écrans
+   seront migrés vers les composants shadcn/ui + Tailwind
+   ================================================================ */
+@layer legacy {
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  nav {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    background: #2e6b3e;
+    color: white;
+    align-items: center;
+  }
+  nav a { color: white; opacity: 0.85; text-decoration: none; }
+  nav a.active { opacity: 1; font-weight: 600; }
+  nav .spacer { flex: 1; }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    margin-bottom: 1rem;
+  }
+
+  .stat {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .stat .value { font-size: 1.8rem; font-weight: 700; color: #2e6b3e; }
+  .stat .label { font-size: 0.85rem; color: #666; }
+
+  .row { display: flex; gap: 0.5rem; align-items: center; }
+  .row.between { justify-content: space-between; }
+
+  .grid { display: grid; gap: 1rem; }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 720px) {
+    .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+  }
+
+  .map-wrap { height: 500px; border-radius: 10px; overflow: hidden; }
+
+  button:not([class*="inline-flex"]) {
+    font: inherit;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: none;
+    background: #2e6b3e;
+    color: white;
+    cursor: pointer;
+  }
+  button:not([class*="inline-flex"]):hover { background: #24552f; }
+  button.secondary:not([class*="inline-flex"]) { background: #eee; color: #333; }
+  button.danger:not([class*="inline-flex"]) { background: #b23b3b; }
+
+  input:not([class*="flex"]):not([type="checkbox"]),
+  textarea:not([class*="flex"]),
+  select:not([class*="flex"]) {
+    font: inherit;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #cfd6cc;
+    background: white;
+    width: 100%;
+  }
+
+  label { display: block; margin-bottom: 0.75rem; font-size: 0.9rem; }
+  label > span { display: block; margin-bottom: 0.25rem; color: #555; }
 }
-button { background: #2e6b3e; color: white; border: none; cursor: pointer; }
-button:hover { background: #24552f; }
-button:disabled { opacity: .6; cursor: wait; }
-button.secondary { background: #eee; color: #333; }
-button.secondary:hover { background: #e0e0e0; }
-button.danger { background: #b23b3b; }
-button.danger:hover { background: #8f2f2f; }
-
-input, textarea, select { width: 100%; }
-
-label { display: block; margin-bottom: 0.75rem; font-size: 0.9rem; }
-label > span { display: block; margin-bottom: 0.25rem; color: #555; }
-
-.grid { display: grid; gap: 1rem; }
-.grid.cols-2 { grid-template-columns: 1fr 1fr; }
-.grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-@media (max-width: 720px) {
-  .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+/* ============================================================
+   Leaflet — intégration design system
+   ============================================================ */
+.leaflet-container {
+  font-family: inherit;
+  z-index: 0;
 }
 
-.stat {
-  background: white; padding: 1rem; border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+/* Boutons de zoom natifs restylés */
+.leaflet-control-zoom {
+  border: none !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+  overflow: hidden;
 }
-.stat .value { font-size: 1.8rem; font-weight: 700; color: #2e6b3e; }
-.stat .label { font-size: 0.85rem; color: #666; }
+.leaflet-control-zoom a {
+  background: white !important;
+  color: #292524 !important;
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 20px !important;
+  font-weight: 500 !important;
+  border: none !important;
+  border-bottom: 1px solid #e7e5e4 !important;
+  transition: background 150ms;
+}
+.leaflet-control-zoom a:hover {
+  background: #f5f5f4 !important;
+  color: #16a34a !important;
+}
+.leaflet-control-zoom a:last-child {
+  border-bottom: none !important;
+}
 
-.map-wrap { height: 500px; border-radius: 10px; overflow: hidden; }
+/* Popup */
+.leaflet-popup-content-wrapper {
+  border-radius: 10px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+  padding: 4px !important;
+}
+.leaflet-popup-content {
+  margin: 10px 14px !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+.leaflet-popup-tip {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+}
+.leaflet-popup-close-button {
+  padding: 8px 8px 0 0 !important;
+  color: #78716c !important;
+  font-size: 20px !important;
+}
+.leaflet-popup-close-button:hover {
+  color: #292524 !important;
+}
 
-.row { display: flex; gap: 0.5rem; align-items: center; }
-.row.between { justify-content: space-between; }
+/* Attribution (bas de carte) */
+.leaflet-control-attribution {
+  font-size: 10px !important;
+  background: rgba(255,255,255,0.85) !important;
+  backdrop-filter: blur(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,55 +1,42 @@
 import { useRef, useState } from 'react';
+import {
+  Camera, ImageIcon, Loader2, RotateCcw, Sparkles, X, Plus,
+  AlertTriangle, Info
+} from 'lucide-react';
+import { Button } from './ui/button';
+import { Progress } from './ui/progress';
 import SpeciesCard from './SpeciesCard.jsx';
 
-// Mapping latin → français pour les espèces les plus communes en France.
-// Sert uniquement à l'affichage : la source de vérité complète est dans data/species.json
+// Mapping latin → français (affichage local, source de vérité : data/species.json)
 const COMMON_NAMES = {
   'Boletus edulis': 'Cèpe de Bordeaux',
   'Boletus pinophilus': 'Cèpe des pins',
   'Boletus reticulatus': "Cèpe d'été",
   'Leccinum scabrum': 'Bolet rude',
   'Leccinum aurantiacum': 'Bolet orangé',
-  'Xerocomus subtomentosus': 'Bolet moucheté',
-  'Suillus luteus': 'Bolet jaune',
-  'Suillus granulatus': 'Bolet granulé',
   'Cantharellus cibarius': 'Girolle',
   'Cantharellus tubaeformis': 'Chanterelle en tube',
   'Craterellus cornucopioides': 'Trompette de la mort',
   'Lactarius deliciosus': 'Lactaire délicieux',
-  'Lactarius sanguifluus': 'Lactaire sanguin',
-  'Russula emetica': 'Russule émétique (toxique)',
   'Russula virescens': 'Russule verdoyante',
-  'Russula cyanoxantha': 'Russule charbonnière',
   'Amanita phalloides': 'Amanite phalloïde (MORTELLE)',
-  'Amanita virosa': 'Amanite vireuse (MORTELLE)',
   'Amanita muscaria': 'Amanite tue-mouches (toxique)',
   'Amanita rubescens': 'Amanite rougissante',
-  'Amanita caesarea': 'Amanite des Césars',
-  'Amanita vaginata': 'Amanite vaginée',
-  'Tricholoma equestre': 'Tricholome équestre (toxique)',
-  'Tricholoma portentosum': 'Tricholome prétentieux',
-  'Armillaria mellea': 'Armillaire couleur de miel',
   'Marasmius oreades': 'Marasme des Oréades',
-  'Pleurotus ostreatus': 'Pleurote en huître',
   'Agaricus campestris': 'Rosé des prés',
   'Macrolepiota procera': 'Coulemelle (Lépiote élevée)',
   'Morchella esculenta': 'Morille comestible',
-  'Morchella conica': 'Morille conique',
   'Gyromitra esculenta': 'Gyromitre (toxique)',
   'Coprinus comatus': 'Coprin chevelu',
   'Lycoperdon perlatum': 'Vesse-de-loup perlée',
   'Hydnum repandum': 'Pied-de-mouton',
-  'Clitocybe nebularis': 'Clitocybe nébuleux',
-  'Clitocybe dealbata': 'Clitocybe blanc (toxique)',
+  'Pleurotus ostreatus': 'Pleurote en huître',
   'Paxillus involutus': 'Paxille enroulé (mortel)',
   'Cortinarius orellanus': 'Cortinaire des montagnes (MORTEL)',
-  'Cortinarius rubellus': 'Cortinaire couleur de rouille (MORTEL)',
   'unknown species': 'Espèce inconnue',
 };
 
-function frenchName(latin) {
-  return COMMON_NAMES[latin] || null;
-}
+const frenchName = latin => COMMON_NAMES[latin] || null;
 
 function formatPct(score) {
   const pct = (score || 0) * 100;
@@ -85,8 +72,8 @@ export default function AiIdentify({ onSpeciesSuggested }) {
     reader.readAsDataURL(f);
   }
 
-  function onFileInput(e) { handleFile(e.target.files?.[0]); }
-  function onCameraInput(e) { handleFile(e.target.files?.[0]); }
+  const onFileInput = e => handleFile(e.target.files?.[0]);
+  const onCameraInput = e => handleFile(e.target.files?.[0]);
 
   async function analyze() {
     if (!file) return;
@@ -128,211 +115,296 @@ export default function AiIdentify({ onSpeciesSuggested }) {
 
   function useSuggestion() {
     if (!result?.primary_species?.latin || !onSpeciesSuggested) return;
-
     onSpeciesSuggested(result.primary_species.latin);
     setJustAdded(true);
-
     setTimeout(() => {
       const el = document.getElementById('add-find-form');
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
-
     setTimeout(() => setJustAdded(false), 2000);
   }
 
   return (
-    <div className="card" style={{ borderLeft: '4px solid #2e6b3e' }}>
-      <h3 style={{ marginTop: 0 }}>🔬 Analyse IA d'une photo</h3>
-
-      {/* Avertissement AVANT toute action — conformité ANSES */}
-      <div style={{
-        padding: '.6rem .9rem',
-        background: '#fdeaea',
-        border: '1px solid #e6a0a0',
-        borderRadius: 8,
-        marginBottom: '.9rem',
-        fontSize: '.85rem',
-        color: '#8a2020'
-      }}>
-        <strong>⚠️ À lire avant de commencer</strong><br />
-        L'IA suggère une espèce, <strong>jamais une garantie</strong>. Ne consommez JAMAIS un
-        champignon identifié uniquement par une application. L'ANSES a documenté 50 % d'erreurs
-        dans ce type d'outil.
+    <div className="mb-4 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+      <div className="border-b border-neutral-200 bg-neutral-50 px-5 py-4 sm:px-6">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-neutral-900">
+          <Sparkles className="h-5 w-5 text-primary-600" />
+          Analyse IA d'une photo
+        </h2>
+        <p className="mt-0.5 text-sm text-neutral-500">
+          Prenez ou importez une photo. L'IA suggère une espèce — <strong>jamais une garantie</strong>.
+        </p>
       </div>
 
-      <div className="row" style={{ marginBottom: '.75rem', flexWrap: 'wrap' }}>
-        <button type="button" onClick={() => cameraRef.current?.click()}>
-          📷 Prendre une photo
-        </button>
-        <button type="button" className="secondary" onClick={() => inputRef.current?.click()}>
-          🖼️ Importer une image
-        </button>
-        {(file || result) && (
-          <button type="button" className="secondary" onClick={reset}>Réinitialiser</button>
+      {/* Bandeau ANSES — toujours visible */}
+      <div className="mx-5 mt-4 flex items-start gap-3 rounded-lg border border-danger-200 bg-danger-50 p-3.5 text-sm text-danger-900 sm:mx-6">
+        <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+        <div>
+          <strong>À lire avant de commencer</strong>
+          <p className="mt-0.5 text-danger-800">
+            Ne consommez JAMAIS un champignon identifié uniquement par une application.
+            L'ANSES a documenté 50 % d'erreurs dans ce type d'outil.
+          </p>
+        </div>
+      </div>
+
+      {/* Zone d'action / upload */}
+      <div className="p-5 sm:p-6">
+        {/* Boutons d'action */}
+        {!preview && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button
+              type="button"
+              size="xl"
+              onClick={() => cameraRef.current?.click()}
+              className="w-full"
+            >
+              <Camera className="h-5 w-5" />
+              Prendre une photo
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="xl"
+              onClick={() => inputRef.current?.click()}
+              className="w-full"
+            >
+              <ImageIcon className="h-5 w-5" />
+              Importer une image
+            </Button>
+          </div>
+        )}
+
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={onCameraInput}
+          style={{ display: 'none' }}
+        />
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={onFileInput}
+          style={{ display: 'none' }}
+        />
+
+        {/* Aperçu photo */}
+        {preview && (
+          <div className="space-y-3">
+            <div className="relative inline-block">
+              <img
+                src={preview}
+                alt="Aperçu"
+                onClick={() => setZoom(true)}
+                className="block max-h-80 max-w-full cursor-zoom-in rounded-lg border border-neutral-200 object-contain"
+              />
+              <button
+                type="button"
+                onClick={reset}
+                className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900/70 text-white backdrop-blur hover:bg-neutral-900"
+                aria-label="Retirer la photo"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {!result && (
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={analyze}
+                  disabled={loading}
+                  className="w-full sm:w-auto"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Analyse en cours…
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-5 w-5" />
+                      Analyser avec l'IA
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="lg"
+                  onClick={reset}
+                  disabled={loading}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Réinitialiser
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-4 rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm text-danger-900">
+            {error}
+          </div>
+        )}
+
+        {/* Résultat */}
+        {result && (
+          <div className="mt-5 space-y-4">
+            {/* Bandeau disclaimer fourni par l'API */}
+            <div className="flex items-start gap-3 rounded-lg border border-warning-300 bg-warning-50 p-3.5 text-sm text-warning-900">
+              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+              <span>{result.disclaimer}</span>
+            </div>
+
+            {/* Meta moteur */}
+            <p className="text-xs text-neutral-500">
+              Moteur : <code className="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[11px]">{result.provider}</code>
+              {result.inference_time_ms && ` — ${result.inference_time_ms} ms`}
+            </p>
+
+            {result.identified === false ? (
+              <div className="flex items-start gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3.5 text-sm text-neutral-700">
+                <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <em>Identification impossible : {result.reasoning}</em>
+              </div>
+            ) : (
+              <>
+                {/* Espèce probable */}
+                <div>
+                  <div className="mb-1 text-sm font-semibold text-neutral-700">
+                    Espèce probable
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setOpenSpecies(result.primary_species.latin)}
+                    className="text-xl font-semibold italic text-primary-700 underline-offset-2 hover:underline"
+                  >
+                    {result.primary_species.latin}
+                  </button>
+                  {frenchName(result.primary_species?.latin) && (
+                    <span className="ml-2 text-lg text-neutral-700">
+                      — {frenchName(result.primary_species.latin)}
+                    </span>
+                  )}
+
+                  <div className="mt-2 flex items-center gap-3">
+                    <Progress
+                      value={(result.confidence || 0) * 100}
+                      className="h-1.5 max-w-xs flex-1"
+                    />
+                    <span className="font-mono text-sm tabular-nums text-neutral-600">
+                      {formatPct(result.confidence)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Alternatives */}
+                {result.alternatives?.length > 0 && (
+                  <div>
+                    <div className="mb-2 text-sm font-semibold text-neutral-700">
+                      Alternatives
+                    </div>
+                    <ul className="space-y-1.5 text-sm">
+                      {result.alternatives.map((a, i) => {
+                        const fr = frenchName(a.latin);
+                        return (
+                          <li key={i} className="flex items-baseline justify-between gap-3">
+                            <span>
+                              <button
+                                type="button"
+                                onClick={() => setOpenSpecies(a.latin)}
+                                className="italic text-primary-700 underline-offset-2 hover:underline"
+                              >
+                                {a.latin}
+                              </button>
+                              {fr && <span className="text-neutral-600"> — {fr}</span>}
+                            </span>
+                            <span className="flex-shrink-0 font-mono text-xs tabular-nums text-neutral-500">
+                              {formatPct(a.confidence)}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Caractères observés */}
+                {result.observed_features?.length > 0 && (
+                  <div>
+                    <div className="mb-1.5 text-sm font-semibold text-neutral-700">
+                      Caractères observés
+                    </div>
+                    <ul className="list-disc space-y-0.5 pl-5 text-sm text-neutral-600">
+                      {result.observed_features.map((f, i) => <li key={i}>{f}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Raisonnement */}
+                {result.reasoning && (
+                  <p className="text-sm text-neutral-600">
+                    <strong className="text-neutral-800">Raisonnement :</strong> {result.reasoning}
+                  </p>
+                )}
+
+                {/* Bouton d'ajout */}
+                {onSpeciesSuggested && result.primary_species?.latin && (
+                  <Button
+                    type="button"
+                    onClick={useSuggestion}
+                    disabled={justAdded}
+                    size="lg"
+                    variant={justAdded ? 'secondary' : 'default'}
+                    className="w-full sm:w-auto"
+                  >
+                    {justAdded ? (
+                      <>✓ Espèce ajoutée au formulaire</>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4" />
+                        Utiliser cette espèce pour une cueillette
+                      </>
+                    )}
+                  </Button>
+                )}
+              </>
+            )}
+
+            {/* Fiche espèce détaillée */}
+            {openSpecies && (
+              <SpeciesCard latin={openSpecies} onClose={() => setOpenSpecies(null)} />
+            )}
+          </div>
         )}
       </div>
 
-      <input
-        ref={cameraRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={onCameraInput}
-        style={{ display: 'none' }}
-      />
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        onChange={onFileInput}
-        style={{ display: 'none' }}
-      />
-
-      {preview && (
-        <div style={{ marginBottom: '1rem' }}>
-          <img
-            src={preview}
-            alt="Aperçu"
-            onClick={() => setZoom(true)}
-            style={{
-              maxWidth: '100%', maxHeight: 320, borderRadius: 8,
-              display: 'block', cursor: 'zoom-in'
-            }}
-          />
-        </div>
-      )}
-
-      {file && !result && (
-        <button type="button" onClick={analyze} disabled={loading}>
-          {loading ? '⏳ Analyse en cours…' : "🔬 Analyser avec l'IA"}
-        </button>
-      )}
-
-      {error && <p style={{ color: 'crimson', marginTop: '1rem' }}>{error}</p>}
-
-      {result && (
-        <div style={{ marginTop: '1rem' }}>
-          <div style={{
-            padding: '.75rem 1rem',
-            background: '#fff7e6',
-            border: '1px solid #f0c674',
-            borderRadius: 8,
-            marginBottom: '1rem'
-          }}>
-            <strong style={{ color: '#8a5a00' }}>⚠️ {result.disclaimer}</strong>
-          </div>
-
-          <p style={{ fontSize: '.8rem', color: '#888', marginTop: '-.5rem' }}>
-            Moteur : <code>{result.provider}</code>
-            {result.inference_time_ms && ` — ${result.inference_time_ms} ms`}
-          </p>
-
-          {result.identified === false ? (
-            <p><em>Identification impossible : {result.reasoning}</em></p>
-          ) : (
-            <>
-              <h4 style={{ margin: '.5rem 0' }}>
-                Espèce probable :{' '}
-                <button
-                  type="button"
-                  onClick={() => setOpenSpecies(result.primary_species.latin)}
-                  style={{
-                    background: 'none', border: 'none', padding: 0, margin: 0,
-                    color: '#2e6b3e', textDecoration: 'underline', cursor: 'pointer',
-                    font: 'inherit', fontStyle: 'italic'
-                  }}
-                >
-                  {result.primary_species.latin}
-                </button>
-                {frenchName(result.primary_species?.latin) && (
-                  <> — {frenchName(result.primary_species.latin)}</>
-                )}
-              </h4>
-              <p style={{ color: '#666', fontSize: '.9rem' }}>
-                Confiance : {formatPct(result.confidence)}
-              </p>
-
-              {result.alternatives?.length > 0 && (
-                <>
-                  <strong>Alternatives :</strong>
-                  <ul>
-                    {result.alternatives.map((a, i) => {
-                      const fr = frenchName(a.latin);
-                      return (
-                        <li key={i}>
-                          <button
-                            type="button"
-                            onClick={() => setOpenSpecies(a.latin)}
-                            style={{
-                              background: 'none', border: 'none', padding: 0, margin: 0,
-                              color: '#2e6b3e', textDecoration: 'underline', cursor: 'pointer',
-                              font: 'inherit', fontStyle: 'italic'
-                            }}
-                          >
-                            {a.latin}
-                          </button>
-                          {fr && ` — ${fr}`} ({formatPct(a.confidence)})
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </>
-              )}
-
-              {result.observed_features?.length > 0 && (
-                <>
-                  <strong>Caractères observés :</strong>
-                  <ul>
-                    {result.observed_features.map((f, i) => <li key={i}>{f}</li>)}
-                  </ul>
-                </>
-              )}
-
-              {result.reasoning && (
-                <p style={{ fontSize: '.9rem', color: '#555' }}>
-                  <strong>Raisonnement :</strong> {result.reasoning}
-                </p>
-              )}
-
-              {onSpeciesSuggested && result.primary_species?.latin && (
-                <button
-                  type="button"
-                  onClick={useSuggestion}
-                  disabled={justAdded}
-                  style={{
-                    marginTop: '.5rem',
-                    background: justAdded ? '#2e6b3e' : undefined,
-                    opacity: justAdded ? 0.85 : 1
-                  }}
-                >
-                  {justAdded
-                    ? '✓ Espèce ajoutée au formulaire'
-                    : '➕ Utiliser cette espèce pour une trouvaille'}
-                </button>
-              )}
-
-              {openSpecies && (
-                <SpeciesCard latin={openSpecies} onClose={() => setOpenSpecies(null)} />
-              )}
-            </>
-          )}
-        </div>
-      )}
-
+      {/* Zoom plein écran */}
       {zoom && preview && (
         <div
           onClick={() => setZoom(false)}
-          style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,.85)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 9999, cursor: 'zoom-out', padding: '2rem'
-          }}
+          className="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/85 p-4"
         >
           <img
             src={preview}
             alt="Aperçu agrandi"
-            style={{ maxWidth: '95%', maxHeight: '95%', borderRadius: 8 }}
+            className="max-h-[95vh] max-w-[95vw] rounded-lg shadow-2xl"
+            onClick={e => e.stopPropagation()}
           />
+          <button
+            type="button"
+            onClick={() => setZoom(false)}
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur hover:bg-white/30"
+            aria-label="Fermer"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
       )}
     </div>

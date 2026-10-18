@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { api } from '../api.js';
+import { Button } from './ui/button';
 
-const EDIBILITY_LABEL = {
-  excellent: { label: 'Excellent comestible', color: '#2e6b3e', bg: '#e7f4ea' },
-  bon: { label: 'Bon comestible', color: '#4a7d2e', bg: '#eef5e6' },
-  comestible: { label: 'Comestible', color: '#6b8f2e', bg: '#f0f5e2' },
-  non_comestible: { label: 'Non comestible', color: '#8a6a00', bg: '#fdf5dc' },
-  toxique: { label: 'Toxique', color: '#b23b3b', bg: '#fbe8e8' },
-  mortel: { label: 'MORTEL', color: '#7a0000', bg: '#f7d5d5' },
-  unknown: { label: 'Comestibilité inconnue', color: '#666', bg: '#eee' }
+const EDIBILITY = {
+  excellent:     { label: 'Excellent comestible', cls: 'bg-primary-600 text-white' },
+  bon:           { label: 'Bon comestible',       cls: 'bg-sage-500 text-white' },
+  comestible:    { label: 'Comestible',           cls: 'bg-sage-500 text-white' },
+  non_comestible:{ label: 'Non comestible',       cls: 'bg-warning-500 text-warning-900' },
+  toxique:       { label: 'Toxique',              cls: 'bg-danger-600 text-white' },
+  mortel:        { label: 'MORTEL',               cls: 'bg-danger-700 text-white font-extrabold uppercase tracking-wider' },
+  unknown:       { label: 'Comestibilité inconnue', cls: 'bg-neutral-200 text-neutral-700' },
 };
 
 export default function SpeciesCard({ latin, onClose }) {
@@ -27,87 +29,83 @@ export default function SpeciesCard({ latin, onClose }) {
   if (!latin) return null;
 
   return (
-    <div style={{
-      marginTop: '1rem',
-      padding: '1rem',
-      background: '#f9faf7',
-      border: '1px solid #dfe5db',
-      borderRadius: 10
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <h4 style={{ margin: 0 }}>
+    <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <h4 className="text-base font-semibold text-neutral-900">
           📖 <em>{latin}</em>
-          {species?.common_fr && <> — {species.common_fr}</>}
+          {species?.common_fr && (
+            <span className="text-neutral-600 font-normal"> — {species.common_fr}</span>
+          )}
         </h4>
         {onClose && (
-          <button
+          <Button
             type="button"
-            className="secondary"
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            style={{ padding: '.25rem .5rem', fontSize: '.8rem' }}
+            aria-label="Fermer"
+            className="-mr-1 -mt-1 flex-shrink-0"
           >
-            ✕
-          </button>
+            <X className="h-4 w-4" />
+          </Button>
         )}
       </div>
 
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
-      {!species && !error && <p style={{ color: '#888' }}>Chargement…</p>}
+      {error && <p className="text-sm text-danger-600">{error}</p>}
+      {!species && !error && <p className="text-sm text-neutral-500">Chargement…</p>}
 
       {species && (
-        <div style={{ marginTop: '.75rem', fontSize: '.9rem' }}>
-          {species.edibility && EDIBILITY_LABEL[species.edibility] && (
-            <p style={{ margin: '.25rem 0' }}>
-              <span style={{
-                display: 'inline-block',
-                padding: '.15rem .55rem',
-                borderRadius: 6,
-                fontWeight: 600,
-                color: EDIBILITY_LABEL[species.edibility].color,
-                background: EDIBILITY_LABEL[species.edibility].bg
-              }}>
-                {EDIBILITY_LABEL[species.edibility].label}
-              </span>
-            </p>
+        <div className="space-y-3 text-sm">
+          {species.edibility && EDIBILITY[species.edibility] && (
+            <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${EDIBILITY[species.edibility].cls}`}>
+              {EDIBILITY[species.edibility].label}
+            </span>
           )}
 
           {species.season?.length > 0 && (
-            <p style={{ margin: '.35rem 0' }}>
-              <strong>📅 Saison :</strong> {species.season.join(', ')}
+            <p className="text-neutral-700">
+              <strong className="text-neutral-900">📅 Saison :</strong>{' '}
+              {species.season.join(', ')}
             </p>
           )}
 
           {species.habitat && (
-            <p style={{ margin: '.35rem 0' }}>
-              <strong>🌳 Habitat :</strong> {species.habitat}
+            <p className="text-neutral-700">
+              <strong className="text-neutral-900">🌳 Habitat :</strong> {species.habitat}
             </p>
           )}
 
           {species.trees?.length > 0 && (
-            <p style={{ margin: '.35rem 0' }}>
-              <strong>🌲 Arbres associés :</strong> {species.trees.join(', ')}
+            <p className="text-neutral-700">
+              <strong className="text-neutral-900">🌲 Arbres associés :</strong>{' '}
+              {species.trees.join(', ')}
             </p>
           )}
 
           {species.notes && (
-            <p style={{ margin: '.5rem 0', color: '#444' }}>{species.notes}</p>
+            <p className="text-neutral-600">{species.notes}</p>
           )}
 
           {species.confusions?.length > 0 && (
-            <div style={{
-              marginTop: '.75rem',
-              padding: '.75rem',
-              background: '#fff7e6',
-              border: '1px solid #f0c674',
-              borderRadius: 8
-            }}>
-              <strong style={{ color: '#8a5a00' }}>⚠️ Confusions possibles</strong>
-              <ul style={{ margin: '.5rem 0 0', paddingLeft: '1.2rem' }}>
+            <div className="rounded-lg border border-warning-300 bg-warning-50 p-3.5">
+              <div className="mb-2 text-sm font-semibold text-warning-900">
+                ⚠️ Confusions possibles
+              </div>
+              <ul className="space-y-2.5">
                 {species.confusions.map((c, i) => (
-                  <li key={i} style={{ marginBottom: '.4rem' }}>
-                    <em>{c.latin}</em> ({c.common_fr}) — <strong>{c.danger}</strong>
-                    <br />
-                    <span style={{ color: '#666', fontSize: '.85rem' }}>{c.how}</span>
+                  <li key={i} className="text-sm">
+                    <div className="text-neutral-900">
+                      <em>{c.latin}</em>
+                      {c.common_fr && ` (${c.common_fr})`}
+                      {c.danger && (
+                        <span className="ml-1 font-semibold text-danger-700">
+                          — {c.danger}
+                        </span>
+                      )}
+                    </div>
+                    {c.how && (
+                      <div className="mt-0.5 text-xs text-neutral-600">{c.how}</div>
+                    )}
                   </li>
                 ))}
               </ul>

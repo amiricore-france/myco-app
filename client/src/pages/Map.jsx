@@ -4,9 +4,15 @@ import {
   useMap, useMapEvents
 } from 'react-leaflet';
 import L from 'leaflet';
+import { MapPin, Plus, Compass } from 'lucide-react';
 import { api } from '../api.js';
+import { Button } from '../components/ui/button';
+import SearchAddress from '../components/SearchAddress.jsx';
 import SpotForm from '../components/SpotForm.jsx';
 import SpotEditor from '../components/SpotEditor.jsx';
+import MapControls from '../components/MapControls.jsx';
+import PageHeader from '../components/PageHeader.jsx';
+import Podium from '../components/Podium.jsx';
 
 // --- Icônes ---
 const icon = new L.Icon({
@@ -18,12 +24,11 @@ const icon = new L.Icon({
 
 const userIcon = new L.DivIcon({
   className: 'user-dot',
-  html: '<div style="width:14px;height:14px;border-radius:50%;background:#2a7fff;border:3px solid white;box-shadow:0 0 0 2px #2a7fff;"></div>',
+  html: '<div style="width:14px;height:14px;border-radius:50%;background:#0284c7;border:3px solid white;box-shadow:0 0 0 2px #0284c7;"></div>',
   iconSize: [20, 20],
   iconAnchor: [10, 10]
 });
 
-// --- Sous-composants ---
 function MapRef({ mapRef }) {
   const map = useMap();
   useEffect(() => { mapRef.current = map; }, [map, mapRef]);
@@ -35,101 +40,11 @@ function ClickHandler({ onClick }) {
   return null;
 }
 
-// --- Recherche d'adresse ---
-function SearchBar({ onSelect }) {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (query.trim().length < 3) {
-      setResults([]);
-      setOpen(false);
-      return;
-    }
-    const ctrl = new AbortController();
-    const t = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&accept-language=fr&q=${encodeURIComponent(query)}`;
-        const res = await fetch(url, {
-          signal: ctrl.signal,
-          headers: { 'Accept': 'application/json' }
-        });
-        const data = await res.json();
-        setResults(data);
-        setOpen(true);
-      } catch (e) {
-        if (e.name !== 'AbortError') console.warn('Recherche échouée', e);
-      } finally {
-        setLoading(false);
-      }
-    }, 400);
-    return () => { ctrl.abort(); clearTimeout(t); };
-  }, [query]);
-
-  function choose(r) {
-    onSelect({ lat: parseFloat(r.lat), lng: parseFloat(r.lon) }, r.display_name);
-    setOpen(false);
-    setQuery(r.display_name);
-  }
-
-  return (
-    <div style={{ position: 'relative', flex: 1, minWidth: 240, maxWidth: 420 }}>
-      <input
-        type="text"
-        placeholder="🔎 Rechercher une ville, forêt, lieu-dit…"
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        onFocus={() => results.length && setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 200)}
-        style={{ width: '100%' }}
-      />
-      {loading && (
-        <span style={{ position: 'absolute', right: 10, top: 10, fontSize: '.8rem', color: '#888' }}>
-          …
-        </span>
-      )}
-      {open && results.length > 0 && (
-        <ul style={{
-          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1000,
-          background: 'white', border: '1px solid #cfd6cc', borderRadius: 6,
-          margin: '.25rem 0 0', padding: 0, listStyle: 'none',
-          maxHeight: 260, overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,.1)'
-        }}>
-          {results.map(r => (
-            <li key={r.place_id}>
-              <button
-                type="button"
-                onMouseDown={e => e.preventDefault()}
-                onClick={() => choose(r)}
-                style={{
-                  display: 'block', width: '100%', textAlign: 'left',
-                  background: 'white', color: '#1e2a1e', border: 'none',
-                  padding: '.5rem .75rem', fontSize: '.85rem', cursor: 'pointer',
-                  borderBottom: '1px solid #f0f0f0'
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f6f7f4'}
-                onMouseLeave={e => e.currentTarget.style.background = 'white'}
-              >
-                {r.display_name}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-// --- Page principale ---
 export default function MapPage() {
   const [spots, setSpots] = useState([]);
   const [pending, setPending] = useState(null);
   const [editingSpot, setEditingSpot] = useState(null);
-  const [center, setCenter] = useState([46.6, 2.4]);
-  const [zoom, setZoom] = useState(8);
+  const [center] = useState([46.6, 2.4]);
   const [userPos, setUserPos] = useState(null);
   const [locating, setLocating] = useState(false);
   const [locError, setLocError] = useState('');
@@ -155,27 +70,17 @@ export default function MapPage() {
         const { latitude, longitude, accuracy } = pos.coords;
         const newCenter = [latitude, longitude];
         setUserPos(newCenter);
-        setCenter(newCenter);
-        setZoom(16);
         mapRef.current?.flyTo(newCenter, 16, { duration: 1.2 });
         setLocating(false);
         setLocInfo(`Position obtenue (±${Math.round(accuracy)} m)`);
       },
       err => {
         setLocating(false);
-        if (err.code === 1) {
-          setLocError('Accès à la position refusé. Vérifiez les autorisations du navigateur (icône 🔒 dans la barre d’adresse).');
-        } else if (err.code === 2) {
-          setLocError('Position indisponible (Wi-Fi/GPS). Réessayez dans quelques secondes.');
-        } else {
-          setLocError('Localisation trop lente. Réessayez ou utilisez la recherche d’adresse.');
-        }
+        if (err.code === 1) setLocError('Accès à la position refusé. Vérifiez les autorisations du navigateur.');
+        else if (err.code === 2) setLocError('Position indisponible. Réessayez dans quelques secondes.');
+        else setLocError('Localisation trop lente. Réessayez ou utilisez la recherche d\'adresse.');
       },
-      {
-        enableHighAccuracy: false,
-        timeout: 30000,
-        maximumAge: 60000
-      }
+      { enableHighAccuracy: false, timeout: 30000, maximumAge: 60000 }
     );
   }
 
@@ -189,8 +94,6 @@ export default function MapPage() {
 
   function gotoSearchResult({ lat, lng }, label) {
     const target = [lat, lng];
-    setCenter(target);
-    setZoom(15);
     mapRef.current?.flyTo(target, 15, { duration: 1.2 });
     setLocInfo(`Résultat : ${label.split(',').slice(0, 2).join(',')}`);
     setLocError('');
@@ -212,31 +115,56 @@ export default function MapPage() {
   }
 
   return (
-    <div className="container">
-      <div style={{ marginBottom: '1rem' }}>
-        <h2 style={{ margin: 0 }}>Carte de mes coins</h2>
-        <p style={{ color: '#666', margin: '.25rem 0 0', fontSize: '.9rem' }}>
-          Recherchez une adresse, cliquez sur la carte, ou cliquez sur un marqueur pour le modifier.
-        </p>
+    <div className="container-page">
+      <PageHeader
+        title="Carte de mes coins"
+        subtitle="Recherchez une adresse, cliquez sur la carte, ou cliquez sur un marqueur pour le modifier."
+      />
+
+      <Podium />
+
+      {/* Barre d'outils : recherche + boutons secondaires */}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <SearchAddress onSelect={gotoSearchResult} className="sm:flex-1 sm:max-w-md" />
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            onClick={locateMe}
+            disabled={locating}
+            className="h-11 flex-1 sm:flex-none"
+          >
+            <Compass className="h-4 w-4" />
+            {locating ? 'Localisation…' : 'Me localiser'}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={addAtCenter}
+            className="h-11 flex-1 sm:flex-none"
+          >
+            <Plus className="h-4 w-4" />
+            Ajouter ici
+          </Button>
+        </div>
       </div>
 
-      <div className="row" style={{ marginBottom: '.75rem', flexWrap: 'wrap' }}>
-        <SearchBar onSelect={gotoSearchResult} />
-        <button onClick={locateMe} disabled={locating}>
-          {locating ? '⏳ Localisation…' : '📍 Me localiser'}
-        </button>
-        <button className="secondary" onClick={addAtCenter}>
-          ➕ Ajouter ici
-        </button>
-      </div>
+      {/* Messages d'état */}
+      {locError && (
+        <div className="mb-3 rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm text-danger-900">
+          {locError}
+        </div>
+      )}
+      {locInfo && !locError && (
+        <div className="mb-3 rounded-lg border border-primary-200 bg-primary-50 p-3 text-sm text-primary-900">
+          {locInfo}
+        </div>
+      )}
 
-      {locError && <p style={{ color: 'crimson', margin: '.25rem 0' }}>{locError}</p>}
-      {locInfo && !locError && <p style={{ color: '#2e6b3e', margin: '.25rem 0', fontSize: '.9rem' }}>{locInfo}</p>}
-
-      <div className="map-wrap">
+      {/* Carte + contrôles flottants */}
+      <div className="map-wrap relative mb-4 h-[400px] overflow-hidden rounded-xl border border-neutral-200 shadow-sm sm:h-[500px]">
         <MapContainer
           center={center}
-          zoom={zoom}
+          zoom={8}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
@@ -253,7 +181,7 @@ export default function MapPage() {
               <Circle
                 center={userPos}
                 radius={30}
-                pathOptions={{ color: '#2a7fff', fillColor: '#2a7fff', fillOpacity: 0.15 }}
+                pathOptions={{ color: '#0284c7', fillColor: '#0284c7', fillOpacity: 0.15 }}
               />
             </>
           )}
@@ -266,25 +194,21 @@ export default function MapPage() {
                 eventHandlers={{ click: () => openEditor(s) }}
               >
                 <Popup>
-                  <strong>{s.name}</strong>
-                  {s.description && <><br /><em>{s.description}</em></>}
-                  <br />
-                  <button
-                    type="button"
-                    onClick={() => openEditor(s)}
-                    style={{
-                      marginTop: '.35rem', padding: '.25rem .5rem',
-                      fontSize: '.8rem', cursor: 'pointer'
-                    }}
-                  >
-                    ✏️ Modifier
-                  </button>
+                  <div className="text-sm">
+                    <strong className="text-neutral-900">{s.name}</strong>
+                    {s.description && (
+                      <>
+                        <br />
+                        <span className="text-neutral-600 italic">{s.description}</span>
+                      </>
+                    )}
+                  </div>
                 </Popup>
               </Marker>
               <Circle
                 center={[s.lat, s.lng]}
                 radius={s.radius_m}
-                pathOptions={{ color: '#2e6b3e' }}
+                pathOptions={{ color: '#16a34a', fillColor: '#16a34a', fillOpacity: 0.05 }}
               />
             </div>
           ))}
@@ -295,10 +219,14 @@ export default function MapPage() {
             </Marker>
           )}
         </MapContainer>
+
+        {/* Contrôles flottants */}
+        <MapControls onLocate={locateMe} onAdd={addAtCenter} locating={locating} />
       </div>
 
+      {/* Formulaire d'ajout */}
       {pending && (
-        <div style={{ marginTop: '1rem' }}>
+        <div className="mb-4">
           <SpotForm
             position={pending}
             onCreated={spot => { setSpots([spot, ...spots]); setPending(null); }}
@@ -307,8 +235,9 @@ export default function MapPage() {
         </div>
       )}
 
+      {/* Éditeur de coin */}
       {editingSpot && (
-        <div style={{ marginTop: '1rem' }}>
+        <div className="mb-4">
           <SpotEditor
             spot={editingSpot}
             onUpdated={handleSpotUpdated}
@@ -318,10 +247,11 @@ export default function MapPage() {
         </div>
       )}
 
-      {!pending && !editingSpot && (
-        <div className="card" style={{ marginTop: '1rem', fontSize: '.9rem', color: '#666' }}>
-          <strong>Astuce :</strong> cliquez sur un marqueur existant pour le modifier,
-          le déplacer, ou le supprimer.
+      {/* Astuce */}
+      {!pending && !editingSpot && spots.length > 0 && (
+        <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-600">
+          <strong className="text-neutral-800">Astuce :</strong> cliquez sur un marqueur existant
+          pour le modifier, ou sur la carte pour créer un nouveau coin.
         </div>
       )}
     </div>

@@ -1,0 +1,24 @@
+import { useEffect, useState } from 'react';
+
+/**
+ * Indique si le navigateur est en ligne.
+ * Se met à jour sur les événements online/offline.
+ */
+export function useOnlineStatus() {
+  const [online, setOnline] = useState(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+
+  useEffect(() => {
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => {
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
+    };
+  }, []);
+
+  return online;
+}

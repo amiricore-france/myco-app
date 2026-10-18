@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Circle } from 'react-leaflet';
 import L from 'leaflet';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
+import { Skeleton } from '../components/ui/skeleton';
 
 const icon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -58,7 +59,18 @@ export default function SharedSpot() {
     );
   }
 
-  if (!spot) return <div className="container">Chargement…</div>;
+  if (!spot) {
+    return (
+      <div className="container-page">
+        <div className="mb-4 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
+          <Skeleton className="mb-3 h-6 w-1/2" />
+          <Skeleton className="mb-2 h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
+        <Skeleton className="h-[400px] w-full rounded-xl sm:h-[500px]" />
+      </div>
+    );
+  }
 
   return (
     <div className="container">

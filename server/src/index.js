@@ -42,5 +42,5 @@ app.use('/api/users', usersRoutes);
 
 const PORT = process.env.PORT || 4400;
 getDb().then(() => {
-  app.listen(PORT, () => console.log(`🌱 API sur http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`🌱 API sur http://0.0.0.0:${PORT}`));
 });
