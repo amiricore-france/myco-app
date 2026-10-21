@@ -19,7 +19,7 @@ Navigateur ──HTTPS──> Nginx (443)
 
 - Un VPS OVH sous Ubuntu 22.04+ (ou Debian 12), accès SSH `root` ou sudo.
 - Un nom de domaine (ou sous-domaine) pointant vers l'IP du VPS (enregistrement A).
-- Node.js 18+ (voir `.nvmrc`).
+- Node.js 20+ (voir `.nvmrc`).
 
 ---
 
@@ -34,8 +34,10 @@ apt install -y nginx git curl
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt install -y nodejs
 
-# Utilisateur système dédié (sans shell de connexion)
-adduser --system --group --home /var/www/myco myco
+# Utilisateur système dédié. Il lui faut un shell pour que le déploiement
+# (scp, GitHub Actions) puisse se connecter en SSH ; l'accès se fait par clé
+# uniquement (pas de mot de passe défini). Son dossier personnel est séparé du code.
+adduser --system --group --shell /bin/bash --home /home/myco myco
 ```
 
 ## 2. Récupérer le code
@@ -154,7 +156,7 @@ ssh myco@VPS 'chown -R myco:myco /var/lib/myco /var/www/myco/server/uploads && s
 1. Autoriser l'utilisateur `myco` à redémarrer le service sans mot de passe :
 
    ```bash
-   echo 'myco ALL=(root) NOPASSWD: /bin/systemctl restart myco-api' > /etc/sudoers.d/myco
+   echo 'myco ALL=(root) NOPASSWD: /usr/bin/systemctl restart myco-api' > /etc/sudoers.d/myco
    chmod 440 /etc/sudoers.d/myco
    ```
 
