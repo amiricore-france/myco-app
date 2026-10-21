@@ -1,0 +1,19 @@
+# (Optionnel) Service systemd pour le microservice d'identification BioCLIP.
+# Nécessaire uniquement si AI_PROVIDER=bioclip. Sinon, ignorez ce fichier.
+# À placer dans /etc/systemd/system/myco-bioclip.service
+
+[Unit]
+Description=Myco BioCLIP (identification locale)
+After=network.target
+
+[Service]
+Type=simple
+User=myco
+WorkingDirectory=/var/www/myco/bioclip-service
+# Environnement Python dédié (voir bioclip-service/install.sh)
+ExecStart=/var/www/myco/bioclip-service/.venv/bin/uvicorn app:app --host 127.0.0.1 --port 5000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

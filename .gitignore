@@ -3,6 +3,8 @@ dist/
 .env
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
 .DS_Store
 *.log
 
@@ -10,6 +12,7 @@ dist/
 server/uploads/
 bioclip-service/.venv/
 bioclip-service/__pycache__/
+bioclip-service/.cache/
 *.pyc
 .backup-*/
 

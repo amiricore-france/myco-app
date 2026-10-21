@@ -1,18 +1,38 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
+const DB_FILE = process.env.DATABASE_FILE || './myco.db';
+
 let db;
+
+/**
+ * Ajoute une colonne si elle n'existe pas déjà (migration douce pour les
+ * bases existantes — ex. celle qui tourne déjà sur l'Optiplex).
+ */
+async function ensureColumn(table, column, definition) {
+  const cols = await db.all(`PRAGMA table_info(${table})`);
+  if (!cols.some(c => c.name === column)) {
+    await db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+}
+
 export async function getDb() {
   if (db) return db;
-  db = await open({ filename: './myco.db', driver: sqlite3.Database });
+  db = await open({ filename: DB_FILE, driver: sqlite3.Database });
   await db.exec(`
     PRAGMA foreign_keys = ON;
+    PRAGMA journal_mode = WAL;
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       name TEXT,
       leaderboard_opt_in INTEGER DEFAULT 0,
+      email_verified INTEGER DEFAULT 0,
+      verification_token TEXT,
+      verification_sent_at DATETIME,
+      reset_token TEXT,
+      reset_token_expires DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     CREATE TABLE IF NOT EXISTS spots (
@@ -77,5 +97,13 @@ export async function getDb() {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_shares_unique
       ON spot_shares(spot_id, from_user_id, to_user_id);
 `);
+
+  // --- Migrations douces pour les bases déjà existantes ---
+  await ensureColumn('users', 'email_verified', 'INTEGER DEFAULT 0');
+  await ensureColumn('users', 'verification_token', 'TEXT');
+  await ensureColumn('users', 'verification_sent_at', 'DATETIME');
+  await ensureColumn('users', 'reset_token', 'TEXT');
+  await ensureColumn('users', 'reset_token_expires', 'DATETIME');
+
   return db;
 }

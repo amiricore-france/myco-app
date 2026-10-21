@@ -1,0 +1,28 @@
+name: Déploiement OVH
+
+# Déploie automatiquement sur le VPS à chaque push sur main.
+# Prérequis — définir ces secrets dans GitHub (Settings → Secrets → Actions) :
+#   VPS_HOST     : IP ou domaine du VPS
+#   VPS_USER     : utilisateur SSH (ex. myco)
+#   VPS_SSH_KEY  : clé privée SSH autorisée sur le VPS
+#   VPS_PORT     : (optionnel) port SSH, 22 par défaut
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # permet aussi un lancement manuel
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Déploiement via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            cd /var/www/myco
+            bash deploy/update.sh

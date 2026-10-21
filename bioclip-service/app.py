@@ -17,8 +17,10 @@ from typing import Optional
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import torch
 from PIL import Image
 from bioclip import CustomLabelsClassifier
+from bioclip.predict import OPENA_AI_IMAGENET_TEMPLATE
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("bioclip")
@@ -73,6 +75,54 @@ logger.info("Chargement de la liste des especes...")
 SPECIES_LABELS = load_species_labels()
 logger.info(f"Classifieur BioCLIP pret avec {len(SPECIES_LABELS)} labels")
 
+# Cache disque des empreintes texte des especes. Leur calcul (80 gabarits par
+# espece) prend plusieurs minutes sur CPU et donne toujours le meme resultat.
+TXT_CACHE_FILE = Path(
+    os.environ.get("BIOCLIP_CACHE_DIR", Path(__file__).resolve().parent / ".cache")
+) / "txt_embeddings.pt"
+
+
+def _cache_signature(model_str: str) -> dict:
+    return {"model": model_str, "templates": len(OPENA_AI_IMAGENET_TEMPLATE)}
+
+
+class CachedLabelsClassifier(CustomLabelsClassifier):
+    """CustomLabelsClassifier dont les empreintes texte sont mises en cache sur
+    disque, espece par espece : seules les especes nouvelles sont calculees."""
+
+    @torch.no_grad()
+    def _get_txt_embeddings(self, classnames):
+        signature = _cache_signature(self.model_str)
+        cache = {}
+        try:
+            data = torch.load(TXT_CACHE_FILE, weights_only=True)
+            if data.get("signature") == signature:
+                cache = data["embeddings"]
+            else:
+                logger.info("Cache d'empreintes obsolete (modele change) : ignore")
+        except FileNotFoundError:
+            pass
+        except Exception as e:
+            logger.warning(f"Cache d'empreintes illisible, recalcul : {e}")
+
+        missing = [c for c in classnames if c not in cache]
+        if missing:
+            logger.info(f"Calcul des empreintes pour {len(missing)} espece(s)...")
+            computed = super()._get_txt_embeddings(missing)
+            for i, c in enumerate(missing):
+                cache[c] = computed[:, i].cpu()
+            try:
+                TXT_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+                tmp = TXT_CACHE_FILE.with_suffix(".tmp")
+                torch.save({"signature": signature, "embeddings": cache}, tmp)
+                tmp.replace(TXT_CACHE_FILE)
+            except Exception as e:
+                logger.warning(f"Impossible d'ecrire le cache d'empreintes : {e}")
+        logger.info(f"Empreintes : {len(classnames) - len(missing)} en cache, {len(missing)} calculee(s)")
+
+        return torch.stack([cache[c].to(self.device) for c in classnames], dim=1)
+
+
 classifier: Optional[CustomLabelsClassifier] = None
 
 
@@ -80,11 +130,10 @@ classifier: Optional[CustomLabelsClassifier] = None
 def load_model():
     global classifier
     try:
-        import torch
         torch.set_num_threads(2)
         logger.info("PyTorch limite a 2 threads CPU")
 
-        classifier = CustomLabelsClassifier(cls_ary=SPECIES_LABELS)
+        classifier = CachedLabelsClassifier(cls_ary=SPECIES_LABELS)
         logger.info("BioCLIP charge avec succes")
     except Exception as e:
         logger.exception(f"Echec du chargement du modele : {e}")

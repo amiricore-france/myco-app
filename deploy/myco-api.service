@@ -1,0 +1,28 @@
+# Service systemd pour l'API Myco — à placer dans /etc/systemd/system/myco-api.service
+# Puis : sudo systemctl daemon-reload && sudo systemctl enable --now myco-api
+#
+# Hypothèses (adaptez si besoin) :
+#   - code déployé dans /var/www/myco
+#   - utilisateur système « myco »
+#   - fichier d'environnement /var/www/myco/server/.env (NODE_ENV=production, JWT_SECRET, …)
+
+[Unit]
+Description=Myco API (Express)
+After=network.target
+
+[Service]
+Type=simple
+User=myco
+WorkingDirectory=/var/www/myco/server
+EnvironmentFile=/var/www/myco/server/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node src/index.js
+Restart=always
+RestartSec=3
+# Durcissement léger
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
