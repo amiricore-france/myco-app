@@ -112,6 +112,7 @@ curl -s http://127.0.0.1:4400/health   # {"ok":true}
 
 ```bash
 cp /var/www/myco/deploy/nginx-myco.conf /etc/nginx/sites-available/myco
+cp /var/www/myco/deploy/nginx-security-headers.conf /etc/nginx/snippets/myco-security-headers.conf
 # Remplacez mon-domaine.fr par votre domaine dans ce fichier
 sed -i 's/mon-domaine.fr/VOTRE-DOMAINE.fr/g' /etc/nginx/sites-available/myco
 ln -sf /etc/nginx/sites-available/myco /etc/nginx/sites-enabled/myco
