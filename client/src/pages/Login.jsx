@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AlertCircle, Clock, Loader2 } from 'lucide-react';
 import { useAuth } from '../auth.jsx';
 import { Input } from '../components/ui/input';
@@ -106,14 +106,12 @@ export default function Login() {
                 <div>
                   <div className="flex items-center justify-between">
                     <Label htmlFor="login-password">Mot de passe</Label>
-                    <button
-                      type="button"
-                      disabled
-                      title="Bientôt disponible"
-                      className="text-xs text-neutral-400 cursor-not-allowed"
+                    <Link
+                      to="/mot-de-passe-oublie"
+                      className="text-xs text-primary-700 hover:underline"
                     >
                       Mot de passe oublié ?
-                    </button>
+                    </Link>
                   </div>
                   <Input
                     id="login-password"
@@ -188,14 +186,14 @@ export default function Login() {
                     type="password"
                     autoComplete="new-password"
                     required
-                    minLength={6}
+                    minLength={8}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    placeholder="Au moins 6 caractères"
+                    placeholder="Au moins 8 caractères"
                     className="h-12"
                   />
                   <p className="mt-1.5 text-xs text-neutral-500">
-                    Minimum 6 caractères. Vous pourrez le modifier plus tard.
+                    Minimum 8 caractères. Vous pourrez le modifier plus tard.
                   </p>
                 </div>
 

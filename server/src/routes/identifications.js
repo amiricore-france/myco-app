@@ -1,16 +1,9 @@
 import { Router } from 'express';
-import { existsSync, mkdirSync, unlinkSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import { getDb } from '../db.js';
 import { authRequired } from '../middleware/auth.js';
+import { safeUnlinkUpload } from '../lib/uploads.js';
 
 const router = Router();
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = join(__dirname, '..', '..', 'uploads');
-
-if (!existsSync(UPLOADS_DIR)) mkdirSync(UPLOADS_DIR, { recursive: true });
 
 // Lister les identifications de l'utilisateur
 router.get('/', authRequired, async (req, res) => {
@@ -77,13 +70,7 @@ router.delete('/:id', authRequired, async (req, res) => {
 
   // Supprime le fichier photo si présent
   if (row.photo_url?.startsWith('/uploads/')) {
-    const filename = row.photo_url.replace('/uploads/', '');
-    const filepath = join(UPLOADS_DIR, filename);
-    try {
-      if (existsSync(filepath)) unlinkSync(filepath);
-    } catch (e) {
-      console.warn('Impossible de supprimer la photo:', e.message);
-    }
+    safeUnlinkUpload(row.photo_url);
   }
 
   await db.run('DELETE FROM identifications WHERE id = ?', row.id);

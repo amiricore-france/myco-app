@@ -38,6 +38,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('user', JSON.stringify(data.user));
     setUser(data.user);
     setExpiredMessage('');
+    return data;
   }
 
   function logout() {
@@ -47,8 +48,24 @@ export function AuthProvider({ children }) {
     setExpiredMessage('');
   }
 
+  // Recharge le profil depuis le serveur et met à jour l'utilisateur stocké
+  // (utile après vérification d'e-mail, changement de nom, etc.).
+  async function refreshUser() {
+    try {
+      const p = await api('/auth/profile', { silent401: true });
+      const next = {
+        id: p.id, email: p.email, name: p.name,
+        leaderboard_opt_in: p.leaderboard_opt_in || 0,
+        email_verified: p.email_verified || 0
+      };
+      localStorage.setItem('user', JSON.stringify(next));
+      setUser(next);
+      return next;
+    } catch { return null; }
+  }
+
   return (
-    <AuthCtx.Provider value={{ user, ready, login, register, logout, expiredMessage, clearExpiredMessage: () => setExpiredMessage('') }}>
+    <AuthCtx.Provider value={{ user, ready, login, register, logout, refreshUser, expiredMessage, clearExpiredMessage: () => setExpiredMessage('') }}>
       {children}
     </AuthCtx.Provider>
   );

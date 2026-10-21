@@ -1,31 +1,49 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 import { useAuth } from './auth.jsx';
 import { useIsMobile } from './hooks/useIsMobile';
 import Navbar from './components/Navbar.jsx';
 import MobileNav from './components/MobileNav.jsx';
 import Header from './components/Header.jsx';
 import Login from './pages/Login.jsx';
-import MapPage from './pages/Map.jsx';
-import Spots from './pages/Spots.jsx';
-import Finds from './pages/Finds.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import SharedSpot from './pages/SharedSpot.jsx';
-import Shares from './pages/Shares.jsx';
-import Profile from './pages/Profile.jsx';
+import Landing from './pages/Landing.jsx';
+
+// Chargement différé des pages lourdes / secondaires (réduit le bundle initial :
+// Leaflet et Recharts ne sont chargés qu'au besoin).
+const MapPage       = lazy(() => import('./pages/Map.jsx'));
+const Spots         = lazy(() => import('./pages/Spots.jsx'));
+const Finds         = lazy(() => import('./pages/Finds.jsx'));
+const Dashboard     = lazy(() => import('./pages/Dashboard.jsx'));
+const SharedSpot    = lazy(() => import('./pages/SharedSpot.jsx'));
+const Shares        = lazy(() => import('./pages/Shares.jsx'));
+const Profile       = lazy(() => import('./pages/Profile.jsx'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
+const ResetPassword  = lazy(() => import('./pages/ResetPassword.jsx'));
+const VerifyEmail    = lazy(() => import('./pages/VerifyEmail.jsx'));
+
+function Loader() {
+  return <div className="container-page text-sm text-neutral-500">Chargement…</div>;
+}
 
 function Private({ children }) {
   const { user, ready } = useAuth();
-  if (!ready) return <div className="container-page">Chargement…</div>;
+  if (!ready) return <Loader />;
   if (!user) return <Navigate to="/login" replace />;
   return children;
 }
 
 function PublicOnly({ children }) {
   const { user, ready } = useAuth();
-  if (!ready) return <div className="container-page">Chargement…</div>;
+  if (!ready) return <Loader />;
   if (user) return <Navigate to="/" replace />;
   return children;
+}
+
+// Accueil : l'app (carte) si connecté, sinon la landing page publique.
+function Home() {
+  const { user, ready } = useAuth();
+  if (!ready) return <Loader />;
+  return user ? <MapPage /> : <Landing />;
 }
 
 function ScrollToTop() {
@@ -39,9 +57,11 @@ export default function App() {
   const { user } = useAuth();
   const location = useLocation();
 
-  const isAuthPage = location.pathname === '/login';
-  const isSharedPage = location.pathname.startsWith('/shared/');
-  const showAppNav = user && !isAuthPage && !isSharedPage;
+  const path = location.pathname;
+  const PUBLIC_PREFIXES = ['/login', '/shared/', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/verifier-email'];
+  const isPublicPage = PUBLIC_PREFIXES.some(p => path === p || path.startsWith(p));
+  const isLanding = path === '/' && !user;
+  const showAppNav = user && !isPublicPage && !isLanding;
 
   return (
     <>
@@ -51,17 +71,22 @@ export default function App() {
       {!isMobile && showAppNav && <Navbar />}
 
       <main className={showAppNav && isMobile ? 'pb-24' : ''}>
-        <Routes>
-          <Route path="/login" element={<PublicOnly><Login /></PublicOnly>} />
-          <Route path="/shared/:token" element={<SharedSpot />} />
-          <Route path="/" element={<Private><MapPage /></Private>} />
-          <Route path="/cueillettes" element={<Private><Finds /></Private>} />
-          <Route path="/spots" element={<Private><Spots /></Private>} />
-          <Route path="/shares" element={<Private><Shares /></Private>} />
-          <Route path="/profile" element={<Private><Profile /></Private>} />
-          <Route path="/dashboard" element={<Private><Dashboard /></Private>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            <Route path="/login" element={<PublicOnly><Login /></PublicOnly>} />
+            <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
+            <Route path="/reinitialiser-mot-de-passe" element={<ResetPassword />} />
+            <Route path="/verifier-email" element={<VerifyEmail />} />
+            <Route path="/shared/:token" element={<SharedSpot />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/cueillettes" element={<Private><Finds /></Private>} />
+            <Route path="/spots" element={<Private><Spots /></Private>} />
+            <Route path="/shares" element={<Private><Shares /></Private>} />
+            <Route path="/profile" element={<Private><Profile /></Private>} />
+            <Route path="/dashboard" element={<Private><Dashboard /></Private>} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </main>
 
       {isMobile && showAppNav && <MobileNav />}

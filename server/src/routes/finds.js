@@ -1,17 +1,11 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { existsSync, mkdirSync, unlinkSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import { nanoid } from 'nanoid';
 import { getDb } from '../db.js';
 import { authRequired } from '../middleware/auth.js';
+import { UPLOADS_DIR, safeUnlinkUpload } from '../lib/uploads.js';
 
 const router = Router();
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = join(__dirname, '..', '..', 'uploads');
-if (!existsSync(UPLOADS_DIR)) mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
@@ -120,12 +114,15 @@ router.delete('/:id/photos/:filename', authRequired, async (req, res) => {
   if (!find) return res.status(404).json({ error: 'Cueillette introuvable' });
 
   const url = `/uploads/${req.params.filename}`;
-  const photos = parsePhotos(find.photos_json).filter(p => p !== url);
+  const current = parsePhotos(find.photos_json);
 
-  const filepath = join(UPLOADS_DIR, req.params.filename);
-  try { if (existsSync(filepath)) unlinkSync(filepath); } catch (e) {
-    console.warn('Impossible de supprimer le fichier:', e.message);
+  // Sécurité : on ne supprime le fichier que s'il appartient bien à cette cueillette.
+  if (!current.includes(url)) {
+    return res.status(404).json({ error: 'Photo introuvable pour cette cueillette' });
   }
+  const photos = current.filter(p => p !== url);
+
+  safeUnlinkUpload(url);
 
   await db.run('UPDATE finds SET photos_json = ? WHERE id = ?', JSON.stringify(photos), find.id);
   res.json({ ...find, photos });
@@ -140,13 +137,7 @@ router.delete('/:id', authRequired, async (req, res) => {
   if (!find) return res.status(404).json({ error: 'Cueillette introuvable' });
 
   for (const url of parsePhotos(find.photos_json)) {
-    const filename = url.replace('/uploads/', '');
-    try {
-      const filepath = join(UPLOADS_DIR, filename);
-      if (existsSync(filepath)) unlinkSync(filepath);
-    } catch (e) {
-      console.warn('Suppression fichier échouée:', e.message);
-    }
+    safeUnlinkUpload(url);
   }
 
   await db.run('DELETE FROM finds WHERE id = ?', find.id);
