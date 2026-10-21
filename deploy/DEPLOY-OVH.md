@@ -179,7 +179,7 @@ ssh myco@VPS 'chown -R myco:myco /var/lib/myco /var/www/myco/server/uploads && s
 1. Autoriser l'utilisateur `myco` à redémarrer le service sans mot de passe :
 
    ```bash
-   echo 'myco ALL=(root) NOPASSWD: /usr/bin/systemctl restart myco-api' > /etc/sudoers.d/myco
+   echo 'myco ALL=(root) NOPASSWD: /usr/bin/systemctl restart myco-api, /usr/bin/systemctl restart myco-bioclip' > /etc/sudoers.d/myco
    chmod 440 /etc/sudoers.d/myco
    ```
 
