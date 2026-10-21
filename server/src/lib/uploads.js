@@ -1,6 +1,7 @@
-import { existsSync, unlinkSync, mkdirSync } from 'fs';
+import { existsSync, unlinkSync, mkdirSync, writeFileSync } from 'fs';
 import { join, dirname, basename, resolve, sep } from 'path';
 import { fileURLToPath } from 'url';
+import sharp from 'sharp';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -43,5 +44,33 @@ export function safeUnlinkUpload(nameOrUrl) {
   } catch (e) {
     console.warn('Impossible de supprimer le fichier:', e.message);
     return false;
+  }
+}
+
+/**
+ * Réencode une image sans ses métadonnées (EXIF, dont la position GPS qui
+ * révélerait l'emplacement d'un coin). L'orientation EXIF est appliquée aux
+ * pixels avant suppression pour que la photo reste dans le bon sens.
+ * Lève une erreur si le contenu n'est pas une image lisible.
+ */
+export function stripImageMetadata(input) {
+  return sharp(input).rotate().toBuffer();
+}
+
+/**
+ * Nettoie sur place les fichiers reçus par multer (req.files).
+ * En cas d'image illisible, supprime tous les fichiers reçus et répond 400.
+ */
+export async function stripUploadedFiles(req, res, next) {
+  const files = req.files || [];
+  try {
+    for (const f of files) {
+      writeFileSync(f.path, await stripImageMetadata(f.path));
+    }
+    next();
+  } catch (e) {
+    console.warn('Image refusée:', e.message);
+    for (const f of files) safeUnlinkUpload(f.filename);
+    res.status(400).json({ error: 'Image illisible ou format non pris en charge (JPEG, PNG ou WebP).' });
   }
 }

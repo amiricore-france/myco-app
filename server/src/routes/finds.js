@@ -3,7 +3,7 @@ import multer from 'multer';
 import { nanoid } from 'nanoid';
 import { getDb } from '../db.js';
 import { authRequired } from '../middleware/auth.js';
-import { UPLOADS_DIR, safeUnlinkUpload } from '../lib/uploads.js';
+import { UPLOADS_DIR, safeUnlinkUpload, stripUploadedFiles } from '../lib/uploads.js';
 
 const router = Router();
 
@@ -44,7 +44,7 @@ router.get('/', authRequired, async (req, res) => {
   res.json(rows.map(r => ({ ...r, photos: parsePhotos(r.photos_json) })));
 });
 
-router.post('/', authRequired, upload.array('photos', 5), async (req, res) => {
+router.post('/', authRequired, upload.array('photos', 5), stripUploadedFiles, async (req, res) => {
   const { spot_id, species, weight_g, notes, found_at } = req.body;
   const uploadedPhotos = (req.files || []).map(f => `/uploads/${f.filename}`);
 
@@ -89,7 +89,7 @@ router.put('/:id', authRequired, async (req, res) => {
   res.json({ ...updated, photos: parsePhotos(updated.photos_json) });
 });
 
-router.post('/:id/photos', authRequired, upload.array('photos', 5), async (req, res) => {
+router.post('/:id/photos', authRequired, upload.array('photos', 5), stripUploadedFiles, async (req, res) => {
   const db = await getDb();
   const find = await db.get(
     'SELECT * FROM finds WHERE id = ? AND user_id = ?',

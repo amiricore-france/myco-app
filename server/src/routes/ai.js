@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { nanoid } from 'nanoid';
 import { getDb } from '../db.js';
 import { authRequired } from '../middleware/auth.js';
+import { stripImageMetadata } from '../lib/uploads.js';
 
 const router = Router();
 
@@ -199,6 +200,13 @@ Reponds UNIQUEMENT en JSON valide :
 router.post('/identify', authRequired, upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Aucune photo fournie' });
+
+    // Retire les métadonnées (GPS…) avant envoi au fournisseur IA et sauvegarde.
+    try {
+      req.file.buffer = await stripImageMetadata(req.file.buffer);
+    } catch {
+      return res.status(400).json({ error: 'Image illisible ou format non pris en charge (JPEG, PNG ou WebP).' });
+    }
 
     const provider = (process.env.AI_PROVIDER || 'demo').toLowerCase();
     let result;
