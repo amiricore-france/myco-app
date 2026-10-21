@@ -12,6 +12,7 @@ dist/
 server/uploads/
 bioclip-service/.venv/
 bioclip-service/__pycache__/
+bioclip-service/.cache/
 *.pyc
 .backup-*/
 
