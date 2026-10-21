@@ -130,6 +130,29 @@ certbot renew --dry-run
 
 À ce stade, l'application est en ligne sur `https://mon-domaine.fr`. 🎉
 
+## 7 bis. Identification BioCLIP (AI_PROVIDER=bioclip)
+
+Le service BioCLIP tourne en local sur le VPS (port 5000, non exposé). Il exige
+Python 3.12 (Pillow 10.4 n'existe pas pour 3.14), installé via `uv` ; PyTorch est
+installé en version CPU (~950 Mo au lieu de plusieurs Go avec CUDA).
+
+```bash
+# uv : binaire officiel (https://github.com/astral-sh/uv/releases), vérifier le .sha256
+cd /var/www/myco/bioclip-service
+sudo -u myco -H uv venv -p 3.12 .venv
+sudo -u myco -H uv pip install -p .venv/bin/python torch==2.14.1 torchvision==0.29.1 \
+  --index-url https://download.pytorch.org/whl/cpu
+sudo -u myco -H uv pip install -p .venv/bin/python -r requirements.txt
+
+cp /var/www/myco/deploy/bioclip.service /etc/systemd/system/myco-bioclip.service
+systemctl daemon-reload && systemctl enable --now myco-bioclip
+# Le modèle (1,6 Go) est téléchargé au premier démarrage dans /home/myco/.cache.
+# Démarrage lent (~9 min sur 4 vCPU) : encodage des noms d'espèces.
+curl -s http://127.0.0.1:5000/health     # {"ok":true,...} une fois prêt
+```
+
+Puis `AI_PROVIDER=bioclip` dans `server/.env` et `systemctl restart myco-api`.
+
 ---
 
 ## 8. Migrer les données depuis l'Optiplex (si besoin)
