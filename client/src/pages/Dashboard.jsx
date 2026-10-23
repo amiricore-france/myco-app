@@ -6,6 +6,7 @@ import IdentificationsHistory from '../components/IdentificationsHistory.jsx';
 import TopSharers from '../components/TopSharers.jsx';
 import SpeciesCard from '../components/SpeciesCard.jsx';
 import PageHeader from '../components/PageHeader.jsx';
+import FlushForecast from '../components/FlushForecast.jsx';
 import { SkeletonCard } from '../components/ui/skeleton';
 
 export default function Dashboard() {
@@ -32,6 +33,8 @@ export default function Dashboard() {
         title="Tableau de bord"
         subtitle="Votre activité, vos identifications et la communauté."
       />
+
+      <FlushForecast />
 
       <div id="ai-species-anchor">
         <AiIdentify

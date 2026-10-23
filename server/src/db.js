@@ -96,6 +96,37 @@ export async function getDb() {
     CREATE INDEX IF NOT EXISTS idx_shares_from_user ON spot_shares(from_user_id, status);
     CREATE UNIQUE INDEX IF NOT EXISTS idx_shares_unique
       ON spot_shares(spot_id, from_user_id, to_user_id);
+
+    -- Premium : abonnements push (navigateurs / PWA installées)
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      endpoint TEXT UNIQUE NOT NULL,
+      p256dh TEXT NOT NULL,
+      auth TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    CREATE INDEX IF NOT EXISTS idx_push_user ON push_subscriptions(user_id);
+
+    -- Premium : alertes de poussée déjà envoyées (anti-doublon)
+    CREATE TABLE IF NOT EXISTS flush_alerts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      spot_id INTEGER NOT NULL,
+      score INTEGER NOT NULL,
+      sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (spot_id) REFERENCES spots(id) ON DELETE CASCADE
+    );
+    CREATE INDEX IF NOT EXISTS idx_flush_alerts ON flush_alerts(user_id, spot_id, sent_at);
+
+    -- Cache météo par maille (~10 km) pour limiter les appels à l'API
+    CREATE TABLE IF NOT EXISTS weather_cache (
+      cell TEXT PRIMARY KEY,
+      fetched_at DATETIME NOT NULL,
+      data_json TEXT NOT NULL
+    );
 `);
 
   // --- Migrations douces pour les bases déjà existantes ---
@@ -104,6 +135,14 @@ export async function getDb() {
   await ensureColumn('users', 'verification_sent_at', 'DATETIME');
   await ensureColumn('users', 'reset_token', 'TEXT');
   await ensureColumn('users', 'reset_token_expires', 'DATETIME');
+
+  // Premium (Stripe) et préférences d'alertes
+  await ensureColumn('users', 'stripe_customer_id', 'TEXT');
+  await ensureColumn('users', 'stripe_subscription_id', 'TEXT');
+  await ensureColumn('users', 'subscription_status', 'TEXT');
+  await ensureColumn('users', 'premium_until', 'DATETIME');
+  await ensureColumn('users', 'alert_email', 'INTEGER DEFAULT 1');
+  await ensureColumn('users', 'alert_push', 'INTEGER DEFAULT 0');
 
   return db;
 }

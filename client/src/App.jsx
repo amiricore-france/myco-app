@@ -2,6 +2,8 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect, Suspense, lazy } from 'react';
 import { useAuth } from './auth.jsx';
 import { useIsMobile } from './hooks/useIsMobile';
+import { useOnlineStatus } from './hooks/useOnlineStatus.js';
+import { WifiOff } from 'lucide-react';
 import Navbar from './components/Navbar.jsx';
 import MobileNav from './components/MobileNav.jsx';
 import Header from './components/Header.jsx';
@@ -56,6 +58,7 @@ export default function App() {
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const location = useLocation();
+  const online = useOnlineStatus();
 
   const path = location.pathname;
   const PUBLIC_PREFIXES = ['/login', '/shared/', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/verifier-email'];
@@ -69,6 +72,13 @@ export default function App() {
 
       {isMobile && showAppNav && <Header />}
       {!isMobile && showAppNav && <Navbar />}
+
+      {!online && showAppNav && (
+        <div role="status" className="flex items-center justify-center gap-2 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-white">
+          <WifiOff className="h-3.5 w-3.5" />
+          Hors-ligne : cartes téléchargées et dernières données consultées
+        </div>
+      )}
 
       <main className={showAppNav && isMobile ? 'pb-24' : ''}>
         <Suspense fallback={<Loader />}>

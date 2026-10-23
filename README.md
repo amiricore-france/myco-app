@@ -16,6 +16,22 @@ Plateforme de gestion, partage et analyse de coins à champignons.
 - Gestion de compte : changement de mot de passe, suppression de compte.
 - Partage de coins entre utilisateurs, podium optionnel.
 
+## Myco Premium
+
+- **Cartes hors-ligne** : fond Plan IGN (Géoplateforme, sans clé). L'app est une PWA
+  installable ; l'utilisateur télécharge le Plan IGN autour d'un coin (1 à 3 km) ou de
+  la zone affichée, et retrouve carte, coins et cueillettes sans réseau
+  (`client/public/sw.js`, `client/src/lib/offline.js`).
+- **Alertes de poussée** : indice 0-100 par coin à partir de la météo Open-Meteo
+  (pluie sur 14 jours, températures, gel), affiché au tableau de bord et envoyé chaque
+  matin par e-mail et/ou notification push (`server/src/lib/flush.js`,
+  `server/src/jobs/flush-alerts.js`, timer `deploy/myco-alerts.timer`).
+- **Abonnement Stripe** : Checkout, portail client et webhook (`server/src/routes/billing.js`).
+  Sans clés Stripe, l'offre s'affiche « bientôt disponible » ; `PREMIUM_FOR_ALL=true`
+  ouvre Premium à tous (lancement gratuit).
+
+Mise en place : `deploy/DEPLOY-OVH.md`, section 11.
+
 ## Variables d'environnement
 
 Voir `server/.env.example`. En production, `JWT_SECRET` est **obligatoire**

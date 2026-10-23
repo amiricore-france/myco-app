@@ -2,16 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Circle } from 'react-leaflet';
 import L from 'leaflet';
+import { BASE_LAYER, markerIconDefault } from '../lib/map.js';
 import { api } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { Skeleton } from '../components/ui/skeleton';
 
-const icon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41], iconAnchor: [12, 41]
-});
+const icon = markerIconDefault;
 
 export default function SharedSpot() {
   const { token } = useParams();
@@ -170,10 +166,7 @@ export default function SharedSpot() {
           zoom={14}
           style={{ height: '100%', width: '100%' }}
         >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+          <TileLayer {...BASE_LAYER} />
           <Marker position={[spot.lat, spot.lng]} icon={icon} />
           <Circle
             center={[spot.lat, spot.lng]}

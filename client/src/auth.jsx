@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { api } from './api.js';
+import { clearOfflineData } from './lib/offline.js';
+import { disablePush } from './lib/push.js';
+import { resetPremiumCache } from './lib/premium.js';
 
 const AuthCtx = createContext(null);
 
@@ -42,11 +45,18 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    localStorage.removeItem('token');
+    // Appareil possiblement partagé : on coupe les notifications de ce compte
+    // et on efface les données hors-ligne (zones de carte = emplacement des coins).
+    disablePush().catch(() => {}).finally(() => {
+      localStorage.removeItem('token');
+      clearOfflineData().catch(() => {});
+    });
+    resetPremiumCache();
     localStorage.removeItem('user');
     setUser(null);
     setExpiredMessage('');
   }
+
 
   // Recharge le profil depuis le serveur et met à jour l'utilisateur stocké
   // (utile après vérification d'e-mail, changement de nom, etc.).

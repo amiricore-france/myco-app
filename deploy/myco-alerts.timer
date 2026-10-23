@@ -1,0 +1,15 @@
+# Déclenche les alertes chaque matin à 7 h 30 (heure de Paris).
+# À placer dans /etc/systemd/system/myco-alerts.timer puis :
+#   sudo systemctl daemon-reload && sudo systemctl enable --now myco-alerts.timer
+#   systemctl list-timers myco-alerts.timer
+
+[Unit]
+Description=Myco - alertes de poussée quotidiennes
+
+[Timer]
+OnCalendar=*-*-* 07:30:00 Europe/Paris
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { getDb } from '../db.js';
 import { sign, authRequired } from '../middleware/auth.js';
+import { isPremiumUser, premiumForAll } from '../lib/premium.js';
+import { cancelSubscriptionNow } from './billing.js';
 import { sendVerificationEmail, sendResetEmail, isMailerConfigured } from '../lib/mailer.js';
 
 const router = Router();
@@ -80,15 +82,23 @@ router.post('/login', async (req, res) => {
 router.get('/profile', authRequired, async (req, res) => {
   const db = await getDb();
   const user = await db.get(
-    'SELECT id, email, name, leaderboard_opt_in, email_verified, created_at FROM users WHERE id = ?',
+    `SELECT id, email, name, leaderboard_opt_in, email_verified, created_at,
+            subscription_status, premium_until, stripe_customer_id, alert_email, alert_push
+     FROM users WHERE id = ?`,
     req.user.id
   );
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
-  res.json(user);
+  const { stripe_customer_id, ...rest } = user;
+  res.json({
+    ...rest,
+    is_premium: isPremiumUser(user),
+    premium_for_all: premiumForAll(),
+    has_billing_account: !!stripe_customer_id
+  });
 });
 
 router.put('/profile', authRequired, async (req, res) => {
-  const { name, leaderboard_opt_in } = req.body;
+  const { name, leaderboard_opt_in, alert_email } = req.body;
   const db = await getDb();
 
   const updates = [];
@@ -97,13 +107,14 @@ router.put('/profile', authRequired, async (req, res) => {
   if (leaderboard_opt_in !== undefined) {
     updates.push('leaderboard_opt_in = ?'); params.push(leaderboard_opt_in ? 1 : 0);
   }
+  if (alert_email !== undefined) { updates.push('alert_email = ?'); params.push(alert_email ? 1 : 0); }
   if (updates.length === 0) return res.status(400).json({ error: 'Aucune donnée à mettre à jour' });
 
   params.push(req.user.id);
   await db.run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, ...params);
 
   const updated = await db.get(
-    'SELECT id, email, name, leaderboard_opt_in, email_verified FROM users WHERE id = ?',
+    'SELECT id, email, name, leaderboard_opt_in, email_verified, alert_email, alert_push FROM users WHERE id = ?',
     req.user.id
   );
   res.json(updated);
@@ -136,6 +147,15 @@ router.delete('/account', authRequired, async (req, res) => {
 
   const ok = await bcrypt.compare(password || '', user.password_hash);
   if (!ok) return res.status(401).json({ error: 'Mot de passe incorrect' });
+
+  // Un abonnement en cours doit être résilié, sinon Stripe continuerait de prélever.
+  if (user.stripe_subscription_id && !['canceled', 'incomplete_expired'].includes(user.subscription_status)) {
+    try { await cancelSubscriptionNow(user.stripe_subscription_id); }
+    catch (e) {
+      console.error('[billing] résiliation à la suppression du compte', e.message);
+      return res.status(502).json({ error: 'Impossible de résilier votre abonnement pour le moment. Réessayez, ou résiliez-le depuis « Gérer mon abonnement ».' });
+    }
+  }
 
   // ON DELETE CASCADE supprime spots, finds, identifications et partages liés.
   await db.run('DELETE FROM users WHERE id = ?', user.id);
