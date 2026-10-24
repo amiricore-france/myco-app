@@ -14,6 +14,8 @@ import speciesRoutes from './routes/species.js';
 import identificationRoutes from './routes/identifications.js';
 import sharesRoutes from './routes/shares.js';
 import usersRoutes from './routes/users.js';
+import billingRoutes, { stripeWebhook } from './routes/billing.js';
+import alertsRoutes from './routes/alerts.js';
 
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
@@ -43,6 +45,9 @@ app.use(cors({
     return cb(null, allowedOrigins.includes(origin));
   }
 }));
+
+// Webhook Stripe : corps brut obligatoire pour vérifier la signature → avant express.json().
+app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
 app.use(express.json({ limit: '12mb' }));
 
@@ -76,6 +81,8 @@ app.use('/api/species', speciesRoutes);
 app.use('/api/identifications', identificationRoutes);
 app.use('/api/shares', sharesRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/billing', billingRoutes);
+app.use('/api/alerts', alertsRoutes);
 
 const PORT = process.env.PORT || 4400;
 getDb().then(() => {

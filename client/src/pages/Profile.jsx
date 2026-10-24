@@ -9,6 +9,8 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Skeleton } from '../components/ui/skeleton';
+import { PremiumSection, AlertSettings } from '../components/PremiumSettings.jsx';
+import { resetPremiumCache } from '../lib/premium.js';
 
 export default function Profile() {
   const { logout, refreshUser } = useAuth();
@@ -22,6 +24,7 @@ export default function Profile() {
   async function load() {
     try {
       const p = await api('/auth/profile');
+      resetPremiumCache();
       setProfile(p);
       setName(p.name || '');
       setOptIn(!!p.leaderboard_opt_in);
@@ -30,6 +33,35 @@ export default function Profile() {
     }
   }
   useEffect(() => { load(); }, []);
+
+  // Retour de Stripe Checkout (?premium=ok|annule) : le webhook peut arriver
+  // quelques secondes après la redirection, on relit le profil jusqu'à activation.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('premium');
+    if (!status) return;
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+    if (status === 'annule') { toast.info('Paiement annulé', 'Aucun montant n’a été débité.'); return; }
+    let tries = 0;
+    const timer = setInterval(async () => {
+      tries++;
+      const p = await api('/auth/profile').catch(() => null);
+      if (p?.is_premium && p.subscription_status) {
+        clearInterval(timer); resetPremiumCache(); setProfile(p);
+        toast.success('Bienvenue dans Myco Premium 🍄', 'Activez vos alertes de poussée ci-dessous.');
+      } else if (tries >= 10) {
+        clearInterval(timer);
+        toast.info('Paiement reçu', 'L’activation peut prendre une minute : rechargez la page si besoin.');
+      }
+    }, 2000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Ancres #premium / #alertes (liens des e-mails et des encarts)
+  useEffect(() => {
+    if (!profile || !window.location.hash) return;
+    document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [!!profile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function save(e) {
     e.preventDefault();
@@ -112,6 +144,10 @@ export default function Profile() {
             </Button>
           </form>
         </section>
+
+        {/* --- Premium --- */}
+        <PremiumSection profile={profile} />
+        {profile.is_premium && <AlertSettings profile={profile} onChange={load} />}
 
         {/* --- Sécurité --- */}
         <ChangePassword />

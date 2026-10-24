@@ -1,0 +1,19 @@
+# Alertes de poussée quotidiennes (Myco Premium) — lancé par myco-alerts.timer.
+# À placer dans /etc/systemd/system/myco-alerts.service
+# Test manuel : sudo systemctl start myco-alerts && journalctl -u myco-alerts -n 50
+
+[Unit]
+Description=Myco - alertes de poussée
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=myco
+WorkingDirectory=/var/www/myco/server
+EnvironmentFile=/var/www/myco/server/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node src/jobs/flush-alerts.js
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true

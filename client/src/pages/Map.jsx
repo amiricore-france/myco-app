@@ -4,6 +4,7 @@ import {
   useMap, useMapEvents
 } from 'react-leaflet';
 import L from 'leaflet';
+import { BASE_LAYER, markerIconDefault } from '../lib/map.js';
 import { MapPin, Plus, Compass } from 'lucide-react';
 import { api } from '../api.js';
 import { Button } from '../components/ui/button';
@@ -13,14 +14,10 @@ import SpotEditor from '../components/SpotEditor.jsx';
 import MapControls from '../components/MapControls.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import Podium from '../components/Podium.jsx';
+import OfflineMapsDialog from '../components/OfflineMapsDialog.jsx';
 
 // --- Icônes ---
-const icon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41], iconAnchor: [12, 41]
-});
+const icon = markerIconDefault;
 
 const userIcon = new L.DivIcon({
   className: 'user-dot',
@@ -49,6 +46,7 @@ export default function MapPage() {
   const [locating, setLocating] = useState(false);
   const [locError, setLocError] = useState('');
   const [locInfo, setLocInfo] = useState('');
+  const [offlineOpen, setOfflineOpen] = useState(false);
 
   const mapRef = useRef(null);
 
@@ -169,10 +167,7 @@ export default function MapPage() {
           style={{ height: '100%', width: '100%' }}
         >
           <MapRef mapRef={mapRef} />
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+          <TileLayer {...BASE_LAYER} />
           <ClickHandler onClick={setPending} />
 
           {userPos && (
@@ -221,8 +216,10 @@ export default function MapPage() {
         </MapContainer>
 
         {/* Contrôles flottants */}
-        <MapControls onLocate={locateMe} onAdd={addAtCenter} locating={locating} />
+        <MapControls onLocate={locateMe} onAdd={addAtCenter} onOffline={() => setOfflineOpen(true)} locating={locating} />
       </div>
+
+      <OfflineMapsDialog open={offlineOpen} onOpenChange={setOfflineOpen} spots={spots} mapRef={mapRef} />
 
       {/* Formulaire d'ajout */}
       {pending && (

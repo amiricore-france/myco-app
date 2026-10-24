@@ -207,6 +207,77 @@ ssh myco@VPS 'cd /var/www/myco && bash deploy/update.sh'
 
 ---
 
+## 11. Myco Premium : cartes hors-ligne, alertes de poussée, Stripe
+
+Tout fonctionne sans Stripe : tant que les clés ne sont pas renseignées, l'offre
+s'affiche « bientôt disponible ». Pour un lancement gratuit avec Premium ouvert
+à tous, mettre `PREMIUM_FOR_ALL=true` dans `.env`.
+
+### 11.1 Nginx (CSP + service worker)
+
+Recopier les deux fichiers mis à jour puis recharger :
+
+```bash
+sudo cp deploy/nginx-security-headers.conf /etc/nginx/snippets/myco-security-headers.conf
+sudo cp deploy/nginx-myco.conf /etc/nginx/sites-available/myco   # puis remettre le server_name / bloc HTTPS de Certbot
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+> Si Certbot a déjà réécrit `sites-available/myco`, n'écrasez pas le fichier :
+> ajoutez-y seulement les deux blocs `location = /sw.js` et
+> `location = /manifest.webmanifest`.
+
+### 11.2 Notifications push (clés VAPID)
+
+```bash
+cd /var/www/myco/server && npx web-push generate-vapid-keys
+```
+
+Reporter `VAPID_PUBLIC_KEY` et `VAPID_PRIVATE_KEY` dans `.env` (une seule fois :
+les changer invalide tous les abonnements existants). Le push exige le HTTPS.
+Sur iPhone, il ne marche que dans l'app ajoutée à l'écran d'accueil (iOS 16.4+).
+
+### 11.3 Alertes quotidiennes (timer systemd)
+
+```bash
+sudo cp deploy/myco-alerts.service deploy/myco-alerts.timer /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now myco-alerts.timer
+# Simulation sans envoi :
+sudo -u myco bash -c 'cd /var/www/myco/server && set -a && . ./.env && node src/jobs/flush-alerts.js --dry-run'
+```
+
+Météo : Open-Meteo est gratuit en **non-commercial** seulement. Dès que Premium
+est vendu, souscrire une offre API Open-Meteo et renseigner `OPEN_METEO_API_KEY`.
+
+### 11.4 Stripe
+
+1. Créer le compte sur stripe.com (statut entrepreneur individuel ou société,
+   SIRET, IBAN pour les virements). Tout se prépare d'abord en **mode test**.
+2. **Produit** : Catalogue de produits → « Myco Premium » avec deux tarifs
+   récurrents (mensuel, annuel). Copier les identifiants `price_…`.
+3. **Portail client** : Paramètres → Billing → Portail client → activer
+   (résiliation, changement de carte, factures).
+4. **Webhook** : Développeurs → Webhooks → ajouter l'endpoint
+   `https://myco.app-fair.fr/api/billing/webhook` avec les événements
+   `checkout.session.completed`, `customer.subscription.created`,
+   `customer.subscription.updated`, `customer.subscription.deleted`.
+   Copier le secret de signature `whsec_…`.
+5. Renseigner dans `.env` : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+   `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY` et les libellés de prix,
+   puis `sudo systemctl restart myco-api`.
+6. Tester avec la carte `4242 4242 4242 4242` (date future, CVC quelconque),
+   vérifier le passage en Premium, la résiliation via « Gérer mon abonnement »,
+   puis basculer sur les clés **live** (nouveau webhook live, nouveaux `price_…`).
+
+En local, les webhooks se testent avec la CLI Stripe :
+`stripe listen --forward-to localhost:4400/api/billing/webhook`.
+
+> Avant d'encaisser : CGV/CGU, mentions légales et politique de confidentialité
+> en ligne, information sur le droit de rétractation (contenu numérique fourni
+> immédiatement), et déclaration du chiffre d'affaires selon votre statut.
+
+---
+
 ## Plus tard : passer à PostgreSQL
 
 SQLite convient très bien au démarrage. Si le nombre d'utilisateurs simultanés
