@@ -16,6 +16,9 @@ import PageHeader from '../components/PageHeader.jsx';
 import OutingMap from '../components/outing/OutingMap.jsx';
 import ReturnCompass from '../components/outing/ReturnCompass.jsx';
 import ContactsManager from '../components/outing/ContactsManager.jsx';
+import DangerLayer from '../components/dangers/DangerLayer.jsx';
+import ReportDangerDialog from '../components/dangers/ReportDangerDialog.jsx';
+import { useNearbyDangers, updateToday, removeToday } from '../lib/dangers.js';
 import { Button } from '../components/ui/button';
 import { cn } from '../lib/utils';
 
@@ -222,6 +225,8 @@ function Active({ snap }) {
   const confirm = useConfirm();
   const { heading, needsPermission, requestPermission } = useHeading();
   const [target, setTarget] = useState(o.car ? 'car' : 'start');
+  const [reportOpen, setReportOpen] = useState(false);
+  const dangers = useNearbyDangers();
   const [, tick] = useState(0);
   useEffect(() => { const t = setInterval(() => tick(x => x + 1), 30000); return () => clearInterval(t); }, []);
 
@@ -350,7 +355,17 @@ function Active({ snap }) {
 
       <OutingMap
         track={o.track} start={o.start} car={o.car} current={snap.current}
-        onCarMove={moveCar} followCurrent className="h-[340px] sm:h-[440px]" />
+        onCarMove={moveCar} followCurrent className="h-[340px] sm:h-[440px]">
+        <DangerLayer reports={dangers.today.filter(r => r.active)}
+          onChanged={r => (r?.removed ? removeToday(r.id) : updateToday(r))} />
+      </OutingMap>
+
+      <Button type="button" variant="outline" onClick={() => setReportOpen(true)}
+        className="h-12 w-full border-danger-200 text-danger-700 hover:bg-danger-50">
+        <TriangleAlert className="h-4 w-4" />Signaler un danger (chasse, travaux…)
+      </Button>
+      <ReportDangerDialog open={reportOpen} onOpenChange={setReportOpen}
+        initialPosition={snap.current ? { lat: snap.current.lat, lng: snap.current.lng, accuracy: snap.current.accuracy } : null} />
 
       <dl className="grid grid-cols-3 gap-2 text-center">
         {[

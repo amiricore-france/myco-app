@@ -30,7 +30,8 @@ function MapRef({ mapRef, onReady }) {
 }
 
 export default function OutingMap({
-  track = [], start, car, current, onCarMove, meColor = '#16a34a', className = '', initialFocus = 'all', followCurrent = false
+  track = [], start, car, current, onCarMove, meColor = '#16a34a', className = '', initialFocus = 'all', followCurrent = false,
+  children
 }) {
   const mapRef = useRef(null);
   const didFit = useRef(false);
@@ -96,6 +97,7 @@ export default function OutingMap({
             <Marker position={[current.lat, current.lng]} icon={meIcon(meColor)} zIndexOffset={1000} />
           </>
         )}
+        {children}
       </MapContainer>
 
       <div className="pointer-events-none absolute right-3 top-3 z-[400] flex flex-col gap-2">

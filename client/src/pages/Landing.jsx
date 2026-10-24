@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Camera, Share2, Trophy, ShieldCheck, Smartphone, WifiOff, BellRing, Mail } from 'lucide-react';
+import { MapPin, Camera, Share2, Trophy, ShieldCheck, Smartphone, WifiOff, BellRing, Mail, TriangleAlert } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import LegalLinks from '../components/LegalLinks.jsx';
 
 const CONTACT_EMAIL = 'contact@app-fair.fr';
 
 const FEATURES = [
   { icon: WifiOff, premium: true, title: 'Cartes IGN hors-ligne', text: 'Téléchargez le Plan IGN autour de vos coins et retrouvez-les en forêt, même sans réseau.' },
   { icon: BellRing, premium: true, title: 'Alertes de poussée', text: 'Pluie, températures, gel : Myco surveille la météo de vos coins et vous prévient quand ça devient favorable.' },
+  { icon: TriangleAlert, title: 'Zones de danger', text: 'Chasse, travaux forestiers… signalez-les et soyez prévenu à moins d’1 km. Historique pour préparer vos sorties.' },
   { icon: MapPin, title: 'Vos coins sur la carte', text: 'Enregistrez vos coins à champignons avec leur position, une zone et des notes privées.' },
   { icon: Camera, title: 'Aide à l\'identification', text: 'Prenez une photo : Myco propose des pistes à titre pédagogique, jamais une garantie de comestibilité.' },
   { icon: Share2, title: 'Partage entre confiance', text: 'Partagez un coin avec une personne précise, acceptez ou refusez ce qu\'on vous propose.' },
@@ -61,7 +63,7 @@ export default function Landing() {
 
       {/* Fonctionnalités */}
       <section className="mx-auto max-w-5xl px-4 pb-16">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map(({ icon: Icon, title, text, premium }) => (
             <div key={title}
               className={`rounded-xl border bg-white p-5 shadow-sm ${premium ? 'border-primary-300 ring-1 ring-primary-100' : 'border-neutral-200'}`}>
@@ -121,6 +123,7 @@ export default function Landing() {
         <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-primary-700 hover:underline">Contact</a>
         <span className="mx-2" aria-hidden>·</span>
         Fond de carte © IGN / Géoplateforme
+        <LegalLinks className="mt-2" />
       </footer>
     </div>
   );

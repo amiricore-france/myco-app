@@ -178,6 +178,47 @@ export async function getDb() {
     );
     CREATE UNIQUE INDEX IF NOT EXISTS idx_points_unique ON outing_points(outing_id, recorded_at);
 
+    -- Signalements de danger (chasse, travaux…) : actifs le jour même (heure de Paris),
+    -- puis conservés DANGER_RETENTION_DAYS jours comme historique. L'auteur n'est jamais
+    -- montré aux autres ; user_id sert à la modération et passe à NULL si le compte est supprimé.
+    CREATE TABLE IF NOT EXISTS danger_reports (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      type TEXT NOT NULL,
+      lat REAL NOT NULL,
+      lng REAL NOT NULL,
+      comment TEXT,
+      day TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      ended_at TEXT,
+      confirmations INTEGER NOT NULL DEFAULT 0,
+      abuse_count INTEGER NOT NULL DEFAULT 0,
+      hidden INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_danger_day ON danger_reports(day);
+    CREATE INDEX IF NOT EXISTS idx_danger_pos ON danger_reports(lat, lng);
+
+    CREATE TABLE IF NOT EXISTS danger_votes (
+      report_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      kind TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      PRIMARY KEY (report_id, user_id, kind),
+      FOREIGN KEY (report_id) REFERENCES danger_reports(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    -- Notifications « danger près de vos coins » déjà envoyées (plafond quotidien)
+    CREATE TABLE IF NOT EXISTS danger_push_log (
+      user_id INTEGER NOT NULL,
+      report_id INTEGER NOT NULL,
+      sent_at TEXT NOT NULL,
+      PRIMARY KEY (user_id, report_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (report_id) REFERENCES danger_reports(id) ON DELETE CASCADE
+    );
+
     -- Proches prévenus pour une sortie donnée (copie figée nom/e-mail)
     CREATE TABLE IF NOT EXISTS outing_contacts (
       outing_id INTEGER NOT NULL,
@@ -202,6 +243,8 @@ export async function getDb() {
   await ensureColumn('users', 'premium_until', 'DATETIME');
   await ensureColumn('users', 'alert_email', 'INTEGER DEFAULT 0');
   await ensureColumn('users', 'alert_push', 'INTEGER DEFAULT 0');
+  // Notification push quand un danger est signalé à moins d'1 km d'un de mes coins
+  await ensureColumn('users', 'danger_push', 'INTEGER DEFAULT 1');
 
   return db;
 }

@@ -24,7 +24,7 @@ router.get('/push/public-key', (_req, res) => {
   res.json({ key: isPushConfigured() ? process.env.VAPID_PUBLIC_KEY : null });
 });
 
-router.post('/push/subscribe', authRequired, requirePremium, async (req, res) => {
+router.post('/push/subscribe', authRequired, async (req, res) => {
   const sub = req.body?.subscription;
   if (!sub?.endpoint || !sub?.keys?.p256dh || !sub?.keys?.auth) {
     return res.status(400).json({ error: 'Abonnement push invalide' });

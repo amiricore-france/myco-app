@@ -5,7 +5,7 @@
  *     · « myco-tiles-zones »   : zones téléchargées par l'utilisateur (Premium),
  *                                jamais purgées automatiquement ;
  *     · « myco-tiles-runtime » : tuiles vues en navigation, plafonnées.
- * - Lecture de l'API hors-ligne (coins, cueillettes, profil) : réseau d'abord,
+ * - Lecture de l'API hors-ligne (coins, cueillettes, profil, signalements) : réseau d'abord,
  *   cache en secours. Ce cache est vidé à la déconnexion (lib/offline.js).
  * - Notifications push (alertes de poussée).
  */
@@ -20,7 +20,7 @@ const RUNTIME_TILES_MAX = 1500;
 
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-192.png'];
 // Lectures d'API utiles hors-ligne (GET uniquement).
-const API_OFFLINE = [/^\/api\/spots(\/|$|\?)/, /^\/api\/finds(\/|$|\?)/, /^\/api\/auth\/profile$/, /^\/api\/species(\/|$|\?)/];
+const API_OFFLINE = [/^\/api\/spots(\/|$|\?)/, /^\/api\/finds(\/|$|\?)/, /^\/api\/auth\/profile$/, /^\/api\/species(\/|$|\?)/, /^\/api\/dangers(\/|$|\?)/];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(SHELL_CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
