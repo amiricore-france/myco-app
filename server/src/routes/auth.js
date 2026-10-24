@@ -51,8 +51,9 @@ router.post('/register', async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
   const verification_token = newToken();
   const result = await db.run(
-    `INSERT INTO users (email, password_hash, name, verification_token, verification_sent_at)
-     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+    // alert_email = 0 : les alertes de poussée sont à activer par l'utilisateur (opt-in).
+    `INSERT INTO users (email, password_hash, name, verification_token, verification_sent_at, alert_email)
+     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, 0)`,
     email, hash, (name || '').trim() || null, verification_token
   );
 

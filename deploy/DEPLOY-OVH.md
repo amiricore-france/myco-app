@@ -242,9 +242,12 @@ Sur iPhone, il ne marche que dans l'app ajoutée à l'écran d'accueil (iOS 16.4
 ```bash
 sudo cp deploy/myco-alerts.service deploy/myco-alerts.timer /etc/systemd/system/
 sudo systemctl daemon-reload && sudo systemctl enable --now myco-alerts.timer
-# Simulation sans envoi :
-sudo -u myco bash -c 'cd /var/www/myco/server && set -a && . ./.env && node src/jobs/flush-alerts.js --dry-run'
+# Simulation sans envoi (--env-file plutôt que « . ./.env » : MAIL_FROM contient des <>) :
+sudo -u myco bash -c 'cd /var/www/myco/server && node --env-file=.env src/jobs/flush-alerts.js --dry-run'
 ```
+
+Les alertes sont en **opt-in** : chaque utilisateur les active dans « Mon compte »
+(e-mail et/ou notification). Aucun envoi n'est fait à un compte qui ne l'a pas demandé.
 
 Météo : Open-Meteo est gratuit en **non-commercial** seulement. Dès que Premium
 est vendu, souscrire une offre API Open-Meteo et renseigner `OPEN_METEO_API_KEY`.

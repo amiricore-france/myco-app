@@ -141,7 +141,7 @@ export async function getDb() {
   await ensureColumn('users', 'stripe_subscription_id', 'TEXT');
   await ensureColumn('users', 'subscription_status', 'TEXT');
   await ensureColumn('users', 'premium_until', 'DATETIME');
-  await ensureColumn('users', 'alert_email', 'INTEGER DEFAULT 1');
+  await ensureColumn('users', 'alert_email', 'INTEGER DEFAULT 0');
   await ensureColumn('users', 'alert_push', 'INTEGER DEFAULT 0');
 
   return db;
