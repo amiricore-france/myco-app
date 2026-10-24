@@ -5,7 +5,9 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import { BASE_LAYER, markerIconDefault } from '../lib/map.js';
-import { MapPin, Plus, Compass } from 'lucide-react';
+import { MapPin, Plus, Compass, Footprints } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useOuting } from '../lib/outing.js';
 import { api } from '../api.js';
 import { Button } from '../components/ui/button';
 import SearchAddress from '../components/SearchAddress.jsx';
@@ -49,6 +51,7 @@ export default function MapPage() {
   const [offlineOpen, setOfflineOpen] = useState(false);
 
   const mapRef = useRef(null);
+  const { outing } = useOuting();
 
   useEffect(() => {
     api('/spots').then(setSpots).catch(() => {});
@@ -117,6 +120,11 @@ export default function MapPage() {
       <PageHeader
         title="Carte de mes coins"
         subtitle="Recherchez une adresse, cliquez sur la carte, ou cliquez sur un marqueur pour le modifier."
+        action={!outing && (
+          <Button asChild size="lg" className="w-full sm:w-auto">
+            <Link to="/sortie" className="hover:no-underline"><Footprints className="h-4 w-4" /> Partir en cueillette</Link>
+          </Button>
+        )}
       />
 
       <Podium />

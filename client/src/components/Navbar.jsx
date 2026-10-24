@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Map, MapPin, Share2, BarChart3, LogOut, User, Sprout } from 'lucide-react';
+import { Map, MapPin, Share2, BarChart3, LogOut, User, Sprout, Footprints } from 'lucide-react';
 import { useAuth } from '../auth.jsx';
 import { api } from '../api.js';
 import { Badge } from './ui/badge';
@@ -17,6 +17,7 @@ import { cn } from '../lib/utils';
 
 const NAV_ITEMS = [
   { to: '/',             label: 'Carte',            icon: Map,       end: true },
+  { to: '/sortie',       label: 'Sortie',           icon: Footprints },
   { to: '/cueillettes',  label: 'Cueillettes',      icon: Sprout },
   { to: '/spots',        label: 'Mes coins',        icon: MapPin },
   { to: '/shares',       label: 'Partages',         icon: Share2 },

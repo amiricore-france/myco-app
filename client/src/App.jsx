@@ -9,6 +9,8 @@ import MobileNav from './components/MobileNav.jsx';
 import Header from './components/Header.jsx';
 import Login from './pages/Login.jsx';
 import Landing from './pages/Landing.jsx';
+import OutingBanner from './components/OutingBanner.jsx';
+import { resumeOuting } from './lib/outing.js';
 
 // Chargement différé des pages lourdes / secondaires (réduit le bundle initial :
 // Leaflet et Recharts ne sont chargés qu'au besoin).
@@ -22,6 +24,8 @@ const Profile       = lazy(() => import('./pages/Profile.jsx'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'));
 const ResetPassword  = lazy(() => import('./pages/ResetPassword.jsx'));
 const VerifyEmail    = lazy(() => import('./pages/VerifyEmail.jsx'));
+const Sortie         = lazy(() => import('./pages/Sortie.jsx'));
+const Follow         = lazy(() => import('./pages/Follow.jsx'));
 
 function Loader() {
   return <div className="container-page text-sm text-neutral-500">Chargement…</div>;
@@ -61,10 +65,13 @@ export default function App() {
   const online = useOnlineStatus();
 
   const path = location.pathname;
-  const PUBLIC_PREFIXES = ['/login', '/shared/', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/verifier-email'];
+  const PUBLIC_PREFIXES = ['/login', '/shared/', '/suivi/', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/verifier-email'];
   const isPublicPage = PUBLIC_PREFIXES.some(p => path === p || path.startsWith(p));
   const isLanding = path === '/' && !user;
   const showAppNav = user && !isPublicPage && !isLanding;
+
+  // Reprend une sortie en cours (rechargement de page, retour dans l'appli, connexion).
+  useEffect(() => { if (user) resumeOuting(); }, [user?.id]);
 
   return (
     <>
@@ -72,6 +79,8 @@ export default function App() {
 
       {isMobile && showAppNav && <Header />}
       {!isMobile && showAppNav && <Navbar />}
+
+      {showAppNav && <OutingBanner />}
 
       {!online && showAppNav && (
         <div role="status" className="flex items-center justify-center gap-2 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-white">
@@ -88,6 +97,8 @@ export default function App() {
             <Route path="/reinitialiser-mot-de-passe" element={<ResetPassword />} />
             <Route path="/verifier-email" element={<VerifyEmail />} />
             <Route path="/shared/:token" element={<SharedSpot />} />
+            <Route path="/suivi/:token" element={<Follow />} />
+            <Route path="/sortie" element={<Private><Sortie /></Private>} />
             <Route path="/" element={<Home />} />
             <Route path="/cueillettes" element={<Private><Finds /></Private>} />
             <Route path="/spots" element={<Private><Spots /></Private>} />

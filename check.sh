@@ -11,7 +11,8 @@ for f in server/package.json client/package.json server/src/index.js; do
 done
 for f in server/src/index.js server/src/db.js server/src/middleware/auth.js \
          server/src/routes/auth.js server/src/routes/spots.js \
-         server/src/routes/finds.js server/src/routes/stats.js; do
+         server/src/routes/finds.js server/src/routes/stats.js \
+         server/src/routes/outings.js server/src/lib/outings.js; do
   [ -f "$f" ] && node --check "$f" 2>/dev/null && ok "$f" || ko "$f"
 done
 echo "Resultat : ${PASS} OK / ${FAIL} echec(s)"
