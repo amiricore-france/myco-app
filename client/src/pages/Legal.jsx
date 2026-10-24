@@ -8,6 +8,7 @@ import LegalLinks from '../components/LegalLinks.jsx';
  * À METTRE À JOUR si l'un de ces points change :
  *   - éditeur (aujourd'hui : particulier, à titre non professionnel et gratuit) ;
  *   - paiement (Stripe non activé) ;
+ *   - envoi des e-mails (aujourd'hui : Brevo ; OVH n'héberge que le service) ;
  *   - identification IA (aujourd'hui : BioCLIP hébergé sur le serveur de Myco ;
  *     si AI_PROVIDER=openai, les photos partent chez OpenAI → section 4 à compléter) ;
  *   - durées de conservation (OUTING_RETENTION_DAYS, DANGER_RETENTION_DAYS…).
@@ -252,7 +253,9 @@ function Confidentialite() {
 
       <H2>4. Destinataires</H2>
       <UL>
-        <li><strong>OVH</strong> (France) : hébergement du service et envoi des e-mails.</li>
+        <li><strong>OVH</strong> (France) : hébergement du service.</li>
+        <li><strong>Brevo</strong> (Sendinblue SAS, France) : envoi des e-mails (vérification de compte, mot de passe,
+          alertes, messages aux proches lors des sorties).</li>
         <li><strong>IGN – Géoplateforme</strong> : votre navigateur télécharge les fonds de carte directement
           auprès de l’IGN, qui reçoit votre adresse IP et la zone affichée.</li>
         <li><strong>Nominatim (OpenStreetMap Foundation)</strong> : reçoit le texte d’une recherche
