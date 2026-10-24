@@ -32,6 +32,20 @@ Plateforme de gestion, partage et analyse de coins à champignons.
 
 Mise en place : `deploy/DEPLOY-OVH.md`, section 11.
 
+## Signalements de danger
+
+Chasse, travaux forestiers, promeneurs, comportement suspect, animaux errants, autre.
+Un signalement est actif le jour même (heure de Paris) : alerte à l'écran à moins d'1 km
+quand la position est connue (carte, sortie), et notification push aux propriétaires
+d'un coin à moins d'1 km. Historique affiché sur la carte avec un code couleur
+d'ancienneté, purgé après `DANGER_RETENTION_DAYS` jours par la tâche quotidienne
+(`server/src/routes/dangers.js`, `client/src/lib/dangers.js`).
+
+## Pages légales
+
+`/mentions-legales`, `/cgu`, `/confidentialite` (`client/src/pages/Legal.jsx`). À mettre à jour
+si l'éditeur, le fournisseur d'identification IA, le paiement ou les durées de conservation changent.
+
 ## Variables d'environnement
 
 Voir `server/.env.example`. En production, `JWT_SECRET` est **obligatoire**

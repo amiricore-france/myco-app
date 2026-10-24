@@ -195,3 +195,20 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Signalements de danger actifs : halo pulsé autour du marqueur */
+.myco-danger { background: transparent; border: 0; }
+.myco-danger--active > div { position: relative; }
+.myco-danger--active > div::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 3px solid var(--c);
+  animation: myco-danger-pulse 1.8s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes myco-danger-pulse {
+  0%   { transform: scale(0.8); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}

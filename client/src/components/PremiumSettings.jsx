@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Sparkles, CreditCard, Loader2, Bell, Mail, Smartphone, Send, Check } from 'lucide-react';
+import { Sparkles, CreditCard, Loader2, Bell, Mail, Smartphone, Send, Check, TriangleAlert } from 'lucide-react';
 import { api } from '../api.js';
 import { startCheckout, openBillingPortal } from '../lib/premium.js';
 import { pushSupported, needsInstallForPush, currentSubscription, enablePush, disablePush } from '../lib/push.js';
@@ -112,9 +112,11 @@ export function PremiumSection({ profile }) {
   );
 }
 
-/** Canaux des alertes de poussée (section « Mon compte », Premium uniquement). */
+/** Notifications : alertes de poussée (Premium) et dangers près de mes coins (pour tous). */
 export function AlertSettings({ profile, onChange }) {
+  const premium = !!profile.is_premium;
   const [emailOn, setEmailOn] = useState(!!profile.alert_email);
+  const [dangerOn, setDangerOn] = useState(profile.danger_push !== 0);
   const [pushOn, setPushOn] = useState(false);
   const [busy, setBusy] = useState('');
 
@@ -124,6 +126,12 @@ export function AlertSettings({ profile, onChange }) {
     setEmailOn(v);
     try { await api('/auth/profile', { method: 'PUT', body: { alert_email: v } }); onChange?.(); }
     catch (e) { setEmailOn(!v); toast.error('Erreur', e.message); }
+  }
+
+  async function toggleDanger(v) {
+    setDangerOn(v);
+    try { await api('/auth/profile', { method: 'PUT', body: { danger_push: v } }); onChange?.(); }
+    catch (e) { setDangerOn(!v); toast.error('Erreur', e.message); }
   }
 
   async function togglePush(v) {
@@ -149,27 +157,31 @@ export function AlertSettings({ profile, onChange }) {
   return (
     <section id="alertes" className="scroll-mt-24 rounded-xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
       <h2 className="mb-1 flex items-center gap-2 text-lg font-semibold text-neutral-900">
-        <Bell className="h-5 w-5 text-primary-600" />Alertes de poussée
+        <Bell className="h-5 w-5 text-primary-600" />Alertes et notifications
       </h2>
       <p className="mb-4 text-sm text-neutral-500">
-        Un message chaque matin où l’un de vos coins devient favorable, au plus une fois par semaine et par coin.
+        Poussée : un message le matin où l’un de vos coins devient favorable (au plus une fois par semaine et par coin).
+        Dangers : une notification quand un danger est signalé à moins d’1 km de l’un de vos coins.
       </p>
 
       <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
-        <ToggleRow Icon={Mail} label="Par e-mail"
-          hint={profile.email_verified ? profile.email : 'Confirmez d’abord votre adresse e-mail'}
-          checked={emailOn} disabled={!profile.email_verified} onChange={toggleEmail} />
-        <ToggleRow Icon={Smartphone} label="Notification sur cet appareil"
+        <ToggleRow Icon={Smartphone} label="Notifications sur cet appareil"
           hint={!pushSupported()
             ? (iosInstall ? 'Sur iPhone : ajoutez Myco à l’écran d’accueil (Partager → Sur l’écran d’accueil), puis ouvrez-le depuis l’icône' : 'Non pris en charge par ce navigateur')
-            : 'À activer sur chaque téléphone ou ordinateur'}
+            : 'Nécessaire pour les notifications ci-dessous, à activer sur chaque téléphone ou ordinateur'}
           checked={pushOn} disabled={!pushSupported() || busy === 'push'} busy={busy === 'push'} onChange={togglePush} />
+        <ToggleRow Icon={TriangleAlert} label="Dangers près de mes coins"
+          hint={pushOn ? 'Chasse, travaux… signalés à moins d’1 km (5 par jour au plus)' : 'Activez d’abord les notifications sur cet appareil'}
+          checked={dangerOn} onChange={toggleDanger} />
+        <ToggleRow Icon={Mail} label={premium ? 'Poussée par e-mail' : 'Poussée par e-mail (Premium)'}
+          hint={!premium ? 'Réservé à Myco Premium' : profile.email_verified ? profile.email : 'Confirmez d’abord votre adresse e-mail'}
+          checked={premium && emailOn} disabled={!premium || !profile.email_verified} onChange={toggleEmail} />
       </div>
 
-      <Button variant="ghost" className="mt-3 h-11 w-full text-primary-700" onClick={test} disabled={!!busy || (!emailOn && !pushOn)}>
+      {premium && <Button variant="ghost" className="mt-3 h-11 w-full text-primary-700" onClick={test} disabled={!!busy || (!emailOn && !pushOn)}>
         {busy === 'test' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        Envoyer une alerte de test
-      </Button>
+        Envoyer une alerte de poussée de test
+      </Button>}
     </section>
   );
 }

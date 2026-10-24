@@ -4,6 +4,7 @@ import { useAuth } from './auth.jsx';
 import { useIsMobile } from './hooks/useIsMobile';
 import { useOnlineStatus } from './hooks/useOnlineStatus.js';
 import { WifiOff } from 'lucide-react';
+import DangerWatcher from './components/dangers/DangerWatcher.jsx';
 import Navbar from './components/Navbar.jsx';
 import MobileNav from './components/MobileNav.jsx';
 import Header from './components/Header.jsx';
@@ -26,6 +27,7 @@ const ResetPassword  = lazy(() => import('./pages/ResetPassword.jsx'));
 const VerifyEmail    = lazy(() => import('./pages/VerifyEmail.jsx'));
 const Sortie         = lazy(() => import('./pages/Sortie.jsx'));
 const Follow         = lazy(() => import('./pages/Follow.jsx'));
+const Legal          = lazy(() => import('./pages/Legal.jsx'));
 
 function Loader() {
   return <div className="container-page text-sm text-neutral-500">Chargement…</div>;
@@ -65,7 +67,7 @@ export default function App() {
   const online = useOnlineStatus();
 
   const path = location.pathname;
-  const PUBLIC_PREFIXES = ['/login', '/shared/', '/suivi/', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/verifier-email'];
+  const PUBLIC_PREFIXES = ['/mentions-legales', '/cgu', '/confidentialite', '/login', '/shared/', '/suivi/', '/mot-de-passe-oublie', '/reinitialiser-mot-de-passe', '/verifier-email'];
   const isPublicPage = PUBLIC_PREFIXES.some(p => path === p || path.startsWith(p));
   const isLanding = path === '/' && !user;
   const showAppNav = user && !isPublicPage && !isLanding;
@@ -81,6 +83,7 @@ export default function App() {
       {!isMobile && showAppNav && <Navbar />}
 
       {showAppNav && <OutingBanner />}
+      {user && <DangerWatcher />}
 
       {!online && showAppNav && (
         <div role="status" className="flex items-center justify-center gap-2 bg-neutral-800 px-3 py-1.5 text-xs font-medium text-white">
@@ -98,6 +101,9 @@ export default function App() {
             <Route path="/verifier-email" element={<VerifyEmail />} />
             <Route path="/shared/:token" element={<SharedSpot />} />
             <Route path="/suivi/:token" element={<Follow />} />
+            <Route path="/mentions-legales" element={<Legal />} />
+            <Route path="/cgu" element={<Legal />} />
+            <Route path="/confidentialite" element={<Legal />} />
             <Route path="/sortie" element={<Private><Sortie /></Private>} />
             <Route path="/" element={<Home />} />
             <Route path="/cueillettes" element={<Private><Finds /></Private>} />

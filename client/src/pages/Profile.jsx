@@ -10,6 +10,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Skeleton } from '../components/ui/skeleton';
 import { PremiumSection, AlertSettings } from '../components/PremiumSettings.jsx';
+import LegalLinks from '../components/LegalLinks.jsx';
 import { resetPremiumCache } from '../lib/premium.js';
 
 export default function Profile() {
@@ -147,7 +148,7 @@ export default function Profile() {
 
         {/* --- Premium --- */}
         <PremiumSection profile={profile} />
-        {profile.is_premium && <AlertSettings profile={profile} onChange={load} />}
+        <AlertSettings profile={profile} onChange={load} />
 
         {/* --- Sécurité --- */}
         <ChangePassword />
@@ -158,6 +159,8 @@ export default function Profile() {
         <Button variant="ghost" onClick={logout} className="h-12 w-full text-neutral-600">
           <LogOut className="h-4 w-4" /> Se déconnecter
         </Button>
+
+        <LegalLinks className="pb-2 text-center text-xs text-neutral-500" />
       </div>
     </div>
   );

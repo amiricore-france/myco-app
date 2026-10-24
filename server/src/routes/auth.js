@@ -84,7 +84,7 @@ router.get('/profile', authRequired, async (req, res) => {
   const db = await getDb();
   const user = await db.get(
     `SELECT id, email, name, leaderboard_opt_in, email_verified, created_at,
-            subscription_status, premium_until, stripe_customer_id, alert_email, alert_push
+            subscription_status, premium_until, stripe_customer_id, alert_email, alert_push, danger_push
      FROM users WHERE id = ?`,
     req.user.id
   );
@@ -99,7 +99,7 @@ router.get('/profile', authRequired, async (req, res) => {
 });
 
 router.put('/profile', authRequired, async (req, res) => {
-  const { name, leaderboard_opt_in, alert_email } = req.body;
+  const { name, leaderboard_opt_in, alert_email, danger_push } = req.body;
   const db = await getDb();
 
   const updates = [];
@@ -109,13 +109,14 @@ router.put('/profile', authRequired, async (req, res) => {
     updates.push('leaderboard_opt_in = ?'); params.push(leaderboard_opt_in ? 1 : 0);
   }
   if (alert_email !== undefined) { updates.push('alert_email = ?'); params.push(alert_email ? 1 : 0); }
+  if (danger_push !== undefined) { updates.push('danger_push = ?'); params.push(danger_push ? 1 : 0); }
   if (updates.length === 0) return res.status(400).json({ error: 'Aucune donnée à mettre à jour' });
 
   params.push(req.user.id);
   await db.run(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, ...params);
 
   const updated = await db.get(
-    'SELECT id, email, name, leaderboard_opt_in, email_verified, alert_email, alert_push FROM users WHERE id = ?',
+    'SELECT id, email, name, leaderboard_opt_in, email_verified, alert_email, alert_push, danger_push FROM users WHERE id = ?',
     req.user.id
   );
   res.json(updated);

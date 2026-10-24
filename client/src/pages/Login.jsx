@@ -220,8 +220,11 @@ export default function Login() {
         </div>
 
         {/* Note légale */}
-        <p className="mt-6 text-center text-xs text-neutral-400">
-          En continuant, vous acceptez de ne jamais consommer un champignon identifié uniquement par une application.
+        <p className="mt-6 text-center text-xs text-neutral-500">
+          En créant un compte, vous acceptez les{' '}
+          <Link to="/cgu" className="underline hover:text-primary-700">conditions d’utilisation</Link> et la{' '}
+          <Link to="/confidentialite" className="underline hover:text-primary-700">politique de confidentialité</Link>.
+          Ne consommez jamais un champignon identifié uniquement par une application.
         </p>
 
       </div>

@@ -17,6 +17,13 @@ import MapControls from '../components/MapControls.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import Podium from '../components/Podium.jsx';
 import OfflineMapsDialog from '../components/OfflineMapsDialog.jsx';
+import DangerLayer from '../components/dangers/DangerLayer.jsx';
+import DangerLegend from '../components/dangers/DangerLegend.jsx';
+import ReportDangerDialog from '../components/dangers/ReportDangerDialog.jsx';
+import {
+  fetchDangers, notePosition, useNearbyDangers, updateToday, removeToday
+} from '../lib/dangers.js';
+import { toast } from '../lib/toast-store';
 
 // --- Icônes ---
 const icon = markerIconDefault;
@@ -34,6 +41,29 @@ function MapRef({ mapRef }) {
   return null;
 }
 
+/** Recharge les signalements de la zone affichée quand la carte bouge ou que la période change. */
+function DangerLoader({ days, onLoaded }) {
+  const map = useMap();
+  useEffect(() => {
+    let timer = null;
+    let cancelled = false;
+    async function load() {
+      const b = map.getBounds();
+      try {
+        const res = await fetchDangers({ south: b.getSouth(), west: b.getWest(), north: b.getNorth(), east: b.getEast() }, days);
+        if (!cancelled) onLoaded(res);
+      } catch { /* hors-ligne : on garde l'affichage précédent */ }
+    }
+    const onMove = () => { clearTimeout(timer); timer = setTimeout(load, 400); };
+    load();
+    map.on('moveend', onMove);
+    return () => { cancelled = true; clearTimeout(timer); map.off('moveend', onMove); };
+  }, [map, days]); // eslint-disable-line react-hooks/exhaustive-deps
+  return null;
+}
+
+const DANGER_DAYS_KEY = 'myco-danger-days';
+
 function ClickHandler({ onClick }) {
   useMapEvents({ click: e => onClick(e.latlng) });
   return null;
@@ -49,6 +79,13 @@ export default function MapPage() {
   const [locError, setLocError] = useState('');
   const [locInfo, setLocInfo] = useState('');
   const [offlineOpen, setOfflineOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [dangerDays, setDangerDays] = useState(() => {
+    const v = Number(localStorage.getItem(DANGER_DAYS_KEY));
+    return [0, 7, 30, 365].includes(v) ? v : 7;
+  });
+  const [dangerData, setDangerData] = useState({ reports: [], too_wide: false });
+  const nearby = useNearbyDangers();
 
   const mapRef = useRef(null);
   const { outing } = useOuting();
@@ -56,6 +93,39 @@ export default function MapPage() {
   useEffect(() => {
     api('/spots').then(setSpots).catch(() => {});
   }, []);
+
+  useEffect(() => { localStorage.setItem(DANGER_DAYS_KEY, String(dangerDays)); }, [dangerDays]);
+
+  // Lien depuis une notification (/?danger=ID) : centrer la carte sur le signalement.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('danger');
+    if (!id) return;
+    window.history.replaceState(null, '', window.location.pathname);
+    api(`/dangers/${encodeURIComponent(id)}`)
+      .then(r => {
+        setDangerData(d => ({ ...d, reports: [r, ...d.reports.filter(x => x.id !== r.id)] }));
+        const go = () => mapRef.current ? mapRef.current.flyTo([r.lat, r.lng], 15, { duration: 1.2 }) : setTimeout(go, 200);
+        go();
+      })
+      .catch(e => toast.info('Signalement indisponible', e.message));
+  }, []);
+
+  // Signalements affichés : zone visible (période choisie) + signalements du jour de la veille de proximité.
+  const dangerReports = (() => {
+    const byId = new Map();
+    for (const r of [...nearby.today, ...dangerData.reports]) byId.set(r.id, { ...byId.get(r.id), ...r });
+    return [...byId.values()].filter(r => r.age_days <= dangerDays);
+  })();
+
+  function handleDangerChanged(res) {
+    if (res?.removed) {
+      removeToday(res.id);
+      setDangerData(d => ({ ...d, reports: d.reports.filter(r => r.id !== res.id) }));
+    } else if (res?.id) {
+      updateToday(res);
+      setDangerData(d => ({ ...d, reports: d.reports.map(r => (r.id === res.id ? { ...r, ...res } : r)) }));
+    }
+  }
 
   function locateMe() {
     if (!navigator.geolocation) {
@@ -71,6 +141,7 @@ export default function MapPage() {
         const { latitude, longitude, accuracy } = pos.coords;
         const newCenter = [latitude, longitude];
         setUserPos(newCenter);
+        notePosition({ lat: latitude, lng: longitude });
         mapRef.current?.flyTo(newCenter, 16, { duration: 1.2 });
         setLocating(false);
         setLocInfo(`Position obtenue (±${Math.round(accuracy)} m)`);
@@ -216,6 +287,9 @@ export default function MapPage() {
             </div>
           ))}
 
+          <DangerLoader days={dangerDays} onLoaded={setDangerData} />
+          <DangerLayer reports={dangerReports} onChanged={handleDangerChanged} />
+
           {pending && (
             <Marker position={[pending.lat, pending.lng]} icon={icon}>
               <Popup>Nouveau point — validez ci-dessous</Popup>
@@ -224,8 +298,15 @@ export default function MapPage() {
         </MapContainer>
 
         {/* Contrôles flottants */}
-        <MapControls onLocate={locateMe} onAdd={addAtCenter} onOffline={() => setOfflineOpen(true)} locating={locating} />
+        <MapControls onLocate={locateMe} onAdd={addAtCenter} onOffline={() => setOfflineOpen(true)}
+          onReport={() => setReportOpen(true)} locating={locating} />
+        <DangerLegend days={dangerDays} onDaysChange={setDangerDays}
+          count={dangerReports.length} tooWide={dangerData.too_wide} />
       </div>
+
+      <ReportDangerDialog open={reportOpen} onOpenChange={setReportOpen}
+        getMapCenter={() => { const c = mapRef.current?.getCenter(); return c ? { lat: c.lat, lng: c.lng } : null; }}
+        onCreated={r => setDangerData(d => ({ ...d, reports: [r, ...d.reports] }))} />
 
       <OfflineMapsDialog open={offlineOpen} onOpenChange={setOfflineOpen} spots={spots} mapRef={mapRef} />
 
