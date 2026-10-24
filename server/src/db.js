@@ -127,6 +127,65 @@ export async function getDb() {
       fetched_at DATETIME NOT NULL,
       data_json TEXT NOT NULL
     );
+
+    -- Sécurité en sortie : proches à prévenir (non-utilisateurs possibles)
+    CREATE TABLE IF NOT EXISTS emergency_contacts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_contacts_unique ON emergency_contacts(user_id, email);
+
+    -- Sorties : point de départ, véhicule, dernière position, suivi par les proches.
+    -- Les dates sont en UTC ISO 8601 (comparables en texte).
+    CREATE TABLE IF NOT EXISTS outings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      client_id TEXT NOT NULL,
+      follow_token TEXT UNIQUE NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active',      -- active | ended | expired
+      share_live INTEGER NOT NULL DEFAULT 1,      -- position transmise au serveur et visible des proches
+      alert_on_silence INTEGER NOT NULL DEFAULT 1,
+      started_at TEXT NOT NULL,
+      expected_return_at TEXT,
+      ended_at TEXT,
+      start_lat REAL, start_lng REAL,
+      car_lat REAL, car_lng REAL,
+      last_lat REAL, last_lng REAL, last_accuracy REAL, last_at TEXT,
+      battery INTEGER,
+      sos_at TEXT,
+      reminder_sent_at TEXT,
+      overdue_notified_at TEXT,
+      silence_notified_at TEXT,
+      silence_recovered_at TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_outings_client ON outings(user_id, client_id);
+    CREATE INDEX IF NOT EXISTS idx_outings_status ON outings(status);
+
+    CREATE TABLE IF NOT EXISTS outing_points (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      outing_id INTEGER NOT NULL,
+      lat REAL NOT NULL,
+      lng REAL NOT NULL,
+      accuracy REAL,
+      recorded_at TEXT NOT NULL,
+      FOREIGN KEY (outing_id) REFERENCES outings(id) ON DELETE CASCADE
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_points_unique ON outing_points(outing_id, recorded_at);
+
+    -- Proches prévenus pour une sortie donnée (copie figée nom/e-mail)
+    CREATE TABLE IF NOT EXISTS outing_contacts (
+      outing_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      PRIMARY KEY (outing_id, email),
+      FOREIGN KEY (outing_id) REFERENCES outings(id) ON DELETE CASCADE
+    );
 `);
 
   // --- Migrations douces pour les bases déjà existantes ---

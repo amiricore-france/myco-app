@@ -281,6 +281,33 @@ En local, les webhooks se testent avec la CLI Stripe :
 
 ---
 
+## 12. Sortie : véhicule, trace et suivi par les proches
+
+Rien à installer en plus : les tables SQLite sont créées au démarrage de l'API
+et la veille des sorties tourne dans le processus `myco-api` (toutes les 2 min).
+Contrôle après un redémarrage :
+
+```bash
+journalctl -u myco-api -n 20 | grep "Veille des sorties"
+```
+
+Pré-requis pour que les proches soient réellement prévenus :
+
+- **SMTP configuré** (section 3) : sans lui, les alertes aux proches sont
+  seulement écrites dans le journal. À tester avant d'annoncer la fonction.
+- **HTTPS** : obligatoire pour la géolocalisation, la boussole et le maintien
+  de l'écran allumé sur téléphone.
+- **Clés VAPID** (11.2), facultatives : rappel « êtes-vous rentré ? » en
+  notification, et alertes en notification pour les proches qui ont un compte Myco.
+
+Réglages (`.env`, valeurs par défaut entre parenthèses) : `OUTING_GRACE_MIN` (30),
+`OUTING_SILENCE_MIN` (60), `OUTING_EXPIRE_HOURS` (24), `OUTING_FOLLOW_TTL_HOURS` (24),
+`OUTING_RETENTION_DAYS` (30). `OUTING_WATCHDOG=off` désactive la veille.
+
+> Limite des applis web : écran éteint, le téléphone suspend la localisation.
+> La veille serveur (heure de retour dépassée, silence prolongé) compense ;
+> un suivi en arrière-plan garanti demanderait une appli native (Capacitor).
+
 ## Plus tard : passer à PostgreSQL
 
 SQLite convient très bien au démarrage. Si le nombre d'utilisateurs simultanés

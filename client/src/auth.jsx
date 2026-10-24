@@ -3,6 +3,7 @@ import { api } from './api.js';
 import { clearOfflineData } from './lib/offline.js';
 import { disablePush } from './lib/push.js';
 import { resetPremiumCache } from './lib/premium.js';
+import { suspendTracking } from './lib/outing.js';
 
 const AuthCtx = createContext(null);
 
@@ -52,6 +53,8 @@ export function AuthProvider({ children }) {
       clearOfflineData().catch(() => {});
     });
     resetPremiumCache();
+    // Sortie en cours : on arrête le GPS mais on garde la sortie (reprise à la reconnexion).
+    suspendTracking();
     localStorage.removeItem('user');
     setUser(null);
     setExpiredMessage('');

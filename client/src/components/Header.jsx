@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Bell, LogOut, User } from 'lucide-react';
+import { BarChart3, LogOut, User } from 'lucide-react';
 import { useAuth } from '../auth.jsx';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import {
@@ -54,6 +54,10 @@ export default function Header() {
             <DropdownMenuItem onSelect={() => navigate('/profile')}>
               <User className="h-4 w-4" />
               Mon compte
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate('/dashboard')}>
+              <BarChart3 className="h-4 w-4" />
+              Tableau de bord
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

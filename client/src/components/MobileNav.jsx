@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Map, MapPin, Share2, BarChart3, Sprout } from 'lucide-react';
+import { Map, MapPin, Share2, Sprout, Footprints } from 'lucide-react';
 import { useAuth } from '../auth.jsx';
 import { api } from '../api.js';
 import { cn } from '../lib/utils';
 
 const ITEMS = [
   { to: '/',             label: 'Carte',       icon: Map,       end: true },
+  { to: '/sortie',       label: 'Sortie',      icon: Footprints },
   { to: '/cueillettes',  label: 'Cueillettes', icon: Sprout },
   { to: '/spots',        label: 'Coins',       icon: MapPin },
   { to: '/shares',       label: 'Partages',    icon: Share2 },
-  { to: '/dashboard',    label: 'Tableau',     icon: BarChart3 },
 ];
 
 export default function MobileNav() {

@@ -16,6 +16,8 @@ import sharesRoutes from './routes/shares.js';
 import usersRoutes from './routes/users.js';
 import billingRoutes, { stripeWebhook } from './routes/billing.js';
 import alertsRoutes from './routes/alerts.js';
+import outingsRoutes from './routes/outings.js';
+import { startOutingWatchdog } from './lib/outings.js';
 
 const app = express();
 const isProd = process.env.NODE_ENV === 'production';
@@ -83,8 +85,12 @@ app.use('/api/shares', sharesRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/alerts', alertsRoutes);
+// Sortie : véhicule, trace, suivi par les proches (limite large : envois de positions réguliers)
+app.use('/api/outings', rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false }), outingsRoutes);
 
 const PORT = process.env.PORT || 4400;
 getDb().then(() => {
   app.listen(PORT, () => console.log(`🌱 API sur http://0.0.0.0:${PORT}`));
+  // Veille des sorties : rappel de retour, alertes aux proches, purge des traces.
+  startOutingWatchdog();
 });
