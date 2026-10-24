@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { CloudRain, Thermometer, RefreshCw, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { CloudRain, Thermometer, RefreshCw, Info, BellRing } from 'lucide-react';
 import { api } from '../api.js';
 import { usePremium } from '../lib/premium.js';
 import PremiumUpsell from './PremiumUpsell.jsx';
@@ -15,7 +16,7 @@ const LEVEL_STYLE = {
 
 /** Indice de poussée de chaque coin, calculé chaque jour à partir de la météo (Premium). */
 export default function FlushForecast() {
-  const { premium, loading: loadingProfile } = usePremium();
+  const { premium, profile, loading: loadingProfile } = usePremium();
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,15 @@ export default function FlushForecast() {
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
+
+      {profile && !profile.alert_email && !profile.alert_push && (
+        <Link to="/profile#alertes"
+          className="mb-4 flex items-center gap-3 rounded-lg border border-primary-200 bg-primary-50 p-3 text-sm text-primary-900 hover:bg-primary-100">
+          <BellRing className="h-4 w-4 shrink-0 text-primary-700" />
+          <span className="flex-1">Soyez prévenu quand un coin devient favorable : activez les alertes par e-mail ou notification.</span>
+          <span className="font-medium text-primary-700">Activer</span>
+        </Link>
+      )}
 
       {error && <p className="rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm text-danger-900">{error}</p>}
 
