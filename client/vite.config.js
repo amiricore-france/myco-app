@@ -22,8 +22,8 @@ export default defineConfig({
     port: 5273,
     strictPort: true,
     proxy: {
-      '/api': 'http://localhost:4400',
-      '/uploads': 'http://localhost:4400'
+      '/api': 'http://127.0.0.1:4400',
+      '/uploads': 'http://127.0.0.1:4400'
     }
   }
 });

@@ -91,8 +91,10 @@ app.use('/api/dangers', dangersRoutes);
 app.use('/api/outings', rateLimit({ windowMs: 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false }), outingsRoutes);
 
 const PORT = process.env.PORT || 4400;
+// Écoute locale par défaut : en production, nginx est seul exposé et proxifie vers 127.0.0.1.
+const HOST = process.env.HOST || '127.0.0.1';
 getDb().then(() => {
-  app.listen(PORT, () => console.log(`🌱 API sur http://0.0.0.0:${PORT}`));
+  app.listen(PORT, HOST, () => console.log(`🌱 API sur http://${HOST}:${PORT}`));
   // Veille des sorties : rappel de retour, alertes aux proches, purge des traces.
   startOutingWatchdog();
 });
