@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
-BASE="${BASE:-http://localhost:4400}"
+BASE="${BASE:-http://127.0.0.1:4400}"
 PASS=0; FAIL=0
 assert() { [ "$2" = "1" ] && { echo "OK  $1"; PASS=$((PASS+1)); } || { echo "ERR $1"; FAIL=$((FAIL+1)); }; }
 EMAIL="test-$(date +%s)@myco.local"; PASSWORD="motdepasse123"
